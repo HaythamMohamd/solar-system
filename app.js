@@ -15,7 +15,7 @@ app.use(cors())
 //     user: process.env.MONGO_USERNAME,
 //     pass: process.env.MONGO_PASSWORD,
 
-mongoose.connect(process.env.MONGO_URI, {
+mongoose.connect('mongodb+srv://supercluster.d83jj.mongodb.net/superData', {
     useNewUrlParser: true,
     // user: 'superuser',
     // pass: 'SuperPassword',
