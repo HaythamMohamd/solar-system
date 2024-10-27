@@ -19,8 +19,8 @@ mongoose.connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
     // user: 'superuser',
     // pass: 'SuperPassword',
-    user: process.env.MONGO_USERNAME,
-    pass: process.env.MONGO_PASSWORD,
+    user: 'process.env.MONGO_USERNAME',
+    pass: 'process.env.MONGO_PASSWORD',
     useUnifiedTopology: true
 }, function (err) {
     if (err) {
