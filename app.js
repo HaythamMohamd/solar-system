@@ -17,10 +17,10 @@ app.use(cors())
 
 mongoose.connect('mongodb+srv://supercluster.d83jj.mongodb.net/superData', {
     useNewUrlParser: true,
-    // user: 'superuser',
-    // pass: 'SuperPassword',
-    user: 'process.env.MONGO_USERNAME',
-    pass: 'process.env.MONGO_PASSWORD',
+    user: 'superuser',
+    pass: 'SuperPassword',
+    // user: 'process.env.MONGO_USERNAME',
+    // pass: 'process.env.MONGO_PASSWORD',
     useUnifiedTopology: true
 }, function (err) {
     if (err) {
