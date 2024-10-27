@@ -325,25 +325,27 @@
 
         - name: Docker image testing 
           run: |
-              # List Docker images
+              # Check Docker images
               docker images
-    
+       
+              # Verify image name format
+              IMAGE_REF="${{ vars.DOCKERHUB_USERNAME }}/solar-system:${{ github.sha }}"
+              echo "Image reference: $IMAGE_REF"
+       
               # Run the Docker container with environment variables
               docker run --name solar-system-app -d \
                 -p 3000:3000 \
                 -e MONGO_URI=$MONGO_URI \
                 -e MONGO_USERNAME=$MONGO_USERNAME \
                 -e MONGO_PASSWORD=$MONGO_PASSWORD \
-                ${{ vars.DOCKERHUB_USERNAME }}/solar-system:${{ github.sha }}
-    
-              # Wait a moment to ensure the container is up
+                $IMAGE_REF
+              
+              # Sleep to give the container time to start
               sleep 5
-    
-              # Get the container's IP address
+       
+              # Inspect IP and test connectivity
               export IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' solar-system-app)
               echo "Container IP: $IP"
-    
-              # Test the image URL using wget
               echo "Testing Image URL using wget"
               wget -q -O - http://127.0.0.1:3000/live | grep live
-    
+           
