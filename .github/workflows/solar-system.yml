@@ -252,7 +252,7 @@
 
 # ================================================= 06-docker build for testing step ===================
 ---
-  name: 05-docker build for testing step
+  name: 05-Docker image testing 
   on:
     workflow_dispatch: null
     push:
@@ -325,7 +325,7 @@
         - name: Docker image testing 
           run: |
             docker images \
-            docker run --image solar-system-app -d \
+            docker run --name solar-system-app -d \
               -p 3000:3000 \
               -e MONGO_URI=$MONGO_URI \
               -e MONGO_USERNAME=$MONGO_USERNAME \
