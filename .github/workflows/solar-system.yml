@@ -303,52 +303,50 @@
 
     docker:
       name: Containerization
-      needs: [unit-testing,code-coverage]
+      needs: [unit-testing, code-coverage]
       runs-on: ubuntu-latest
       steps:
         - name: Checkout Repo
           uses: actions/checkout@v4
 
         - name: DockerHub Login 
-          uses: docker/login-action@v2.2.0
+          uses: docker/login-action@v2
           with:
             username: ${{ vars.DOCKERHUB_USERNAME }}
             password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
         - name: Docker build for testing 
-          uses: docker/build-push-action@v4
+          uses: docker/build-push-action@v3
           with:
             context: .
             push: false
-            tag: ${{ vars.DOCKERHUB_USERNAME }}/solar-system:${{ github.sha}}
-
+            tags: ${{ vars.DOCKERHUB_USERNAME }}/solar-system:${{ github.sha }}
 
         - name: Docker image testing 
           run: |
-              # Check Docker images
-              docker images
+            # Check Docker images
+            docker images
 
-              # Run the Docker container with environment variables
-              docker run --name solar-system-app -d \
-                -p 3000:3000 \
-                -e MONGO_URI=$MONGO_URI \
-                -e MONGO_USERNAME=$MONGO_USERNAME \
-                -e MONGO_PASSWORD=$MONGO_PASSWORD \
-                ${{ vars.DOCKERHUB_USERNAME }}/solar-system:${{ github.sha}}
-              
-              # Sleep to give the container time to start
-              sleep 5
-      
-              # Inspect IP and test connectivity
-              export IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' solar-system-app)
-              echo "Container IP: $IP"
-              echo "Testing Image URL using wget"
-              wget -q -O - http://127.0.0.1:3000/live | grep live
+            # Run the Docker container with environment variables
+            docker run --name solar-system-app -d \
+              -p 3000:3000 \
+              -e MONGO_URI=$MONGO_URI \
+              -e MONGO_USERNAME=$MONGO_USERNAME \
+              -e MONGO_PASSWORD=$MONGO_PASSWORD \
+              ${{ vars.DOCKERHUB_USERNAME }}/solar-system:${{ github.sha }}
+            
+            # Sleep to give the container time to start
+            sleep 5
 
-        - name: Docker build for testing 
-          uses: docker/build-push-action@v2.2.0
+            # Inspect IP and test connectivity
+            export IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' solar-system-app)
+            echo "Container IP: $IP"
+            echo "Testing Image URL using wget"
+            wget -q -O - http://127.0.0.1:3000/live | grep live
+
+        - name: Docker build and push 
+          uses: docker/build-push-action@v3
           with:
             context: .
             push: true
-            tag: ${{ vars.DOCKERHUB_USERNAME }}/solar-system:${{ github.sha}}
-    
+            tags: ${{ vars.DOCKERHUB_USERNAME }}/solar-system:${{ github.sha }}
