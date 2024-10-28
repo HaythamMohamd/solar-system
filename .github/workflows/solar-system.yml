@@ -250,9 +250,9 @@
 #             push: false
 #             tag: ${{ vars.DOCKERHUB_USERNAME }}/solar-system:${{ github.sha}}
 
-# ================================================= 06-docker build for testing step ===================
+# ================================================= 06-Docker image testing and push  ===================
 ---
-  name: 05-Docker image testing 
+  name: 06-Docker image testing and push
   on:
     workflow_dispatch: null
     push:
@@ -320,7 +320,7 @@
           with:
             context: .
             push: false
-            tag: ${{ vars.DOCKERHUB_USERNAME }}/solar-system:v01
+            tag: ${{ vars.DOCKERHUB_USERNAME }}/solar-system:${{ github.sha}}
 
 
         - name: Docker image testing 
@@ -329,10 +329,11 @@
               docker images
       
               # Define image reference
-              IMAGE_REF="${{ vars.DOCKERHUB_USERNAME }}/solar-system:v01
+              IMAGE_REF="${{ vars.DOCKERHUB_USERNAME }}/solar-system:${{ github.sha }}"
+              echo "Image reference: $IMAGE_REF"
       
               # Run the Docker container with environment variables
-              docker run --name solar-system-app -d \
+              docker run -d --name solar-system-app  \
                 -p 3000:3000 \
                 -e MONGO_URI=$MONGO_URI \
                 -e MONGO_USERNAME=$MONGO_USERNAME \
@@ -348,10 +349,10 @@
               echo "Testing Image URL using wget"
               wget -q -O - http://127.0.0.1:3000/live | grep live
 
-        - name: Docker Push
+        - name: Docker build for testing 
           uses: docker/build-push-action@v2.2.0
           with:
             context: .
             push: true
-            tag: ${{ vars.DOCKERHUB_USERNAME }}/solar-system:v01
+            tag: ${{ vars.DOCKERHUB_USERNAME }}/solar-system:${{ github.sha}}
     
