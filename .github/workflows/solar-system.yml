@@ -321,7 +321,7 @@
             context: .
             push: false
             #tag: ${{ vars.DOCKERHUB_USERNAME }}/solar-system:${{ github.sha}}
-            tag: haytham1992/solar-system:${{ github.sha}}
+            tag: haytham1992/solar-system
 
 
         - name: Docker image testing 
@@ -331,7 +331,7 @@
       
               # Define image reference
               #IMAGE_REF="${{ vars.DOCKERHUB_USERNAME }}/solar-system:${{ github.sha }}"
-              IMAGE_REF="haytham1992/solar-system:${{ github.sha }}"
+              IMAGE_REF="haytham1992/solar-system"
               echo "Image reference: $IMAGE_REF"
       
               # Run the Docker container with environment variables
