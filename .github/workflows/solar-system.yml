@@ -329,7 +329,8 @@
               docker images
       
               # Define image reference
-              IMAGE_REF="${{ vars.DOCKERHUB_USERNAME }}/solar-system:${{ github.sha }}"
+              #IMAGE_REF="${{ vars.DOCKERHUB_USERNAME }}/solar-system:${{ github.sha }}"
+              IMAGE_REF="haytham1992/solar-system:${{ github.sha }}"
               echo "Image reference: $IMAGE_REF"
       
               # Run the Docker container with environment variables
