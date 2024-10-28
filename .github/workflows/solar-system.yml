@@ -320,7 +320,8 @@
           with:
             context: .
             push: false
-            tag: ${{ vars.DOCKERHUB_USERNAME }}/solar-system:${{ github.sha}}
+            #tag: ${{ vars.DOCKERHUB_USERNAME }}/solar-system:${{ github.sha}}
+            tag: haytham1992/solar-system:${{ github.sha}}
 
 
         - name: Docker image testing 
