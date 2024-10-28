@@ -549,7 +549,7 @@
         - name: GHCR Login 
           uses: docker/login-action@v2.2.0
           with:
-            registry: gchr.io
+            registry: ghcr.io
             username: ${{ github.repository_owner }}
             password: ${{ secrets.GITHUB_TOKEN }}
 
