@@ -600,3 +600,4 @@
             tags: |
               ${{vars.DOCKERHUB_ACCOUNT}}/solar-system:${{ github.sha }}
               ghcr.io/haythammohamed/solar-system:${{ github.sha }} 
+# test
