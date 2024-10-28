@@ -351,8 +351,124 @@
 #             push: true
 #             tags: ${{vars.DOCKERHUB_ACCOUNT}}/solar-system:${{ github.sha }}
 # ================================================= 07-using cache  ===================
+# ---
+#   name: 07-using cache
+#   on:
+#     workflow_dispatch: null
+#     push:
+#       branches:
+#         - main
+#         - feature/*
+#   env:
+#     MONGO_URI: mongodb+srv://supercluster.d83jj.mongodb.net/superData
+#     MONGO_USERNAME: superuser
+#     MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
+#   jobs:
+#     unit-testing:
+#       name: Unit Testing
+#       runs-on: ubuntu-latest
+#       steps:
+#         - name: Checkout Repository
+#           uses: actions/checkout@v4
+#         - name: Setup NodeJS Version
+#           uses: actions/setup-node@v3
+#           with:
+#             node-version: 20
+#         - name: Install Dependencies
+#           run: npm install
+        
+#         - name: Cache NPM Dependencies 
+#           uses: actions/cache@v3
+#           with:
+#             path: node_modules
+#             key: ${{ runner.os }}-node_modules-${{ hashFiles('package.json') }}
+
+#         - name: Unit Testing
+#           run: npm test
+
+#         - name: Archive Test Result
+#           if: always() #added
+#           uses: actions/upload-artifact@v3
+#           with:
+#             name: Mocha-Test-Result
+#             path: test-results.xml
+
+#     code-coverage:
+#       runs-on: ubuntu-latest
+#       steps:
+#         - uses: actions/checkout@v4
+#         - uses: actions/setup-node@v3
+#           with:
+#             node-version: 18
+
+#         - name: Cache NPM Dependencies 
+#           uses: actions/cache@v3
+#           with:
+#             path: node_modules
+#             key: ${{ runner.os }}-node_modules-${{ hashFiles('package.json') }}
+
+#         - run: npm install
+#         - continue-on-error: true
+#           run: npm run coverage
+#         - uses: actions/upload-artifact@v3
+#           with:
+#             name: Code-Coverage-Result
+#             path: coverage
+#             retention-days: 5
+
+#     docker:
+#       name: Containerization
+#       needs: [unit-testing, code-coverage]
+#       runs-on: ubuntu-latest
+#       steps:
+#         - name: Checkout Repo
+#           uses: actions/checkout@v4
+
+#         - name: DockerHub Login 
+#           uses: docker/login-action@v2
+#           with:
+#             username: ${{ vars.DOCKERHUB_USERNAME }}
+#             password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+#         - name: Docker build for testing 
+#           uses: docker/build-push-action@v4
+#           with:
+#             context: .
+#             push: false
+#             tags: ${{vars.DOCKERHUB_ACCOUNT}}/solar-system:${{ github.sha }}
+
+#         - name: Docker image testing 
+#           run: |
+#             # Check Docker images
+#             docker images
+
+#             # Run the Docker container with environment variables
+#             docker run --name solar-system-app -d \
+#               -p 3000:3000 \
+#               -e MONGO_URI=$MONGO_URI \
+#               -e MONGO_USERNAME=$MONGO_USERNAME \
+#               -e MONGO_PASSWORD=$MONGO_PASSWORD \
+#               ${{vars.DOCKERHUB_ACCOUNT}}/solar-system:${{ github.sha }}
+            
+#             # Sleep to give the container time to start
+#             sleep 5
+
+#             # Inspect IP and test connectivity
+#             export IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' solar-system-app)
+#             echo "Container IP: $IP"
+#             echo "Testing Image URL using wget"
+#             wget -q -O - http://127.0.0.1:3000/live | grep live
+
+#         - name: Docker build and push 
+#           uses: docker/build-push-action@v3
+#           with:
+#             context: .
+#             push: true
+#             tags: ${{vars.DOCKERHUB_ACCOUNT}}/solar-system:${{ github.sha }}
+
+# ================================================= 08- Login and Push to GHCR  ===================
 ---
-  name: 07-using cache
+  name: 08-Login and Push to GHCR
   on:
     workflow_dispatch: null
     push:
@@ -430,6 +546,13 @@
             username: ${{ vars.DOCKERHUB_USERNAME }}
             password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
+        - name: GHCR Login 
+          uses: docker/login-action@v2.2.0
+          with:
+            registry: gchr.io
+            username: ${{ github.repository_owner }}
+            password: ${{ secrets.GITHUB_TOKEN }}
+
         - name: Docker build for testing 
           uses: docker/build-push-action@v4
           with:
@@ -460,9 +583,17 @@
             wget -q -O - http://127.0.0.1:3000/live | grep live
 
         - name: Docker build and push 
-          uses: docker/build-push-action@v3
+          uses: docker/build-push-action@v4
           with:
             context: .
             push: true
             tags: ${{vars.DOCKERHUB_ACCOUNT}}/solar-system:${{ github.sha }}
-# 
+
+        - name: Container Registry Push 
+          uses: docker/build-push-action@v4
+          with:
+            context: .
+            push: true
+            tags: |
+              ${{vars.DOCKERHUB_ACCOUNT}}/solar-system:${{ github.sha }}
+              ghcr.io/${{ github.repository_owner }}/solar-system:${{ github.sha }}
