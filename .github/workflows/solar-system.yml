@@ -465,3 +465,4 @@
             context: .
             push: true
             tags: ${{vars.DOCKERHUB_ACCOUNT}}/solar-system:${{ github.sha }}
+# 
