@@ -1,1217 +1,1217 @@
-################################################## 01 my first workflow ##################################################
+# ################################################## 01 my first workflow ##################################################
 
-# name my first workflow
-
-# on push
-
-# jobs
-#   first_job
-#     runs-on ubuntu-latest
-#     steps
-#     - name welcome message
-#       run echo my first github actions job
-
-#     - name list files
-#       run ls
-
-#     - name read the file
-#       run cat README.md
-
-################################################## 02 use checkout action ##################################################
-
-# name my first workflow
-
-# on push
-
-# jobs
-#   first_job
-#     runs-on ubuntu-latest
-#     steps
-#     - name Checkout Repo
-#       uses actionscheckout@v4
-
-#     - name welcome message
-#       run echo my first github actions job
-
-#     - name list files
-#       run ls
-
-#     - name read the file
-#       run cat README.md
-
-################################################## 03 Multi-Line commands and Executing Third Party Libraries ##################################################
-
-# name my first workflow
-
-# on push
-
-# jobs
-#   first_job
-#     runs-on ubuntu-latest
-#     steps
-#     - name Checkout Repo
-#       uses actionscheckout@v4
-
-#     - name list files and read files
-#       run
-#         echo my first github actions job
-#         ls -lta
-#         cat README.md
-
-#     - name generate ASCII artwork
-#       run cowsay -f dargon Run for cover, I am a dragon ... RARW  dragon.txt
-
-################################################## 04 Workflow to Generate ASCII Artwork ##################################################
-
-# name my first workflow
-
-# on push
-
-# jobs
-#   first_job
-#     runs-on ubuntu-latest
-#     steps
-#     - name Checkout Repo
-#       uses actionscheckout@v4
-
-#     - name install cosway app
-#       run sudo apt-get install cowsay  -y
-
-#     - name generate ASCII artwork
-#       run echo 5ali balak el dragon is here  dragon.txt
-
-#     - name test files exists
-#       run cat dragon.txt  grep -i dragon
-
-#     - name List Repo files
-#       run ls -ltra
-
-################################################## 05 Executing Shell Scripts in Workflow ##################################################
-
-# name my first workflow
-
-# on push
-
-# jobs
-#   first_job
-#     runs-on ubuntu-latest
-#     steps
-#     - name Checkout Repo
-#       uses actionscheckout@v4
-
-#     - name List Repo files
-#       run ls -ltra
-
-#     - name Executing shell script
-#       run
-#         chmod +x cowsay.sh
-#         .cowsay.sh
-
-################################################## 06 Workflow with multiple Jobs ##################################################
-
-# name Workflow with multiple Jobs
-
-# on push
-
-# jobs
-#   build_job_1
-#     runs-on ubuntu-latest
-#     steps
-#     - name install cosway
-#       run sudo apt-get install cowsay -y
-
-#     - name generate ASCII artwork
-#       run cowsay -f dragon Run for cover, I am a dragon ... RARW  dragon.txt
-
-#     - name sleep for 30 sec
-#       run sleep 30
-
-#   test_job_2
-#     runs-on ubuntu-latest
-#     steps
-
-#     - name sleep for 10 sec
-#       run sleep 10
-
-#     - name test file exists
-#       run grep -i dragon dragon.txt
-
-#   deploy_job_3
-#     runs-on ubuntu-latest
-#     steps
-#     - name read file
-#       run cat dragon.txt
-
-#     - name Deploy
-#       run echo deploying
-
-################################################## 07 Workflow with multiple Jobs with needs ##################################################
-
-# name Workflow with multiple Jobs
-
-# on push
-
-# jobs
-#   build_job_1
-#     runs-on ubuntu-latest
-#     steps
-#     - name install cosway
-#       run sudo apt-get install cowsay -y
-
-#     - name generate ASCII artwork
-#       run cowsay -f dragon Run for cover, I am a dragon ... RARW  dragon.txt
-
-#     - name sleep for 30 sec
-#       run sleep 30
-
-#   test_job_2
-#     needs build_job_1
-#     runs-on ubuntu-latest
-#     steps
-#     - name sleep for 10 sec
-#       run sleep 10
-
-#     - name test file exists
-#       run grep -i dragon dragon.txt
-
-#   deploy_job_3
-#     needs test_job_2
-#     runs-on ubuntu-latest
-#     steps
-#     - name read file
-#       run cat dragon.txt
-
-#     - name Deploy
-#       run echo deploying
-
-################################################## 08 cosway with needs then uplaod and download ##################################################
-# name 08 cosway with needs then uplaod and download
-
-# on push
-
-# jobs
-#   build_job_1
-#     runs-on ubuntu-latest
-#     steps
-#     - name install cosway
-#       run sudo apt-get install cowsay -y
-
-#     - name generate ASCII artwork
-#       run cowsay -f dragon Run for cover, I am a dragon ... RARW  dragon.txt
-
-#     - name read file
-#       run cat dragon.txt
-
-#     - name upload the dragon.tx file to be downloaded after that from other jobs
-#       uses actionsupload-artifact@v4
-#       with
-#         name dragon-text-file
-#         path dragon.txt
-
-#     - name sleep for 10 sec
-#       run sleep 10
-
-#   test_job_2
-#     needs build_job_1
-#     runs-on ubuntu-latest
-#     steps
-
-#     - name sleep for 10 sec
-#       run sleep 10
-
-#     - name download  the dragon.tx file to cat it
-#       uses actionsdownload-artifact@v4
-#       with
-#         name dragon-text-file
-
-#     - name test file exists
-#       run grep -i dragon dragon.txt
-
-#   deploy_job_3
-#     needs [build_job_1, test_job_2]
-#     runs-on ubuntu-latest
-#     steps
-#     - name download  the dragon.tx file to cat it
-#       uses actionsdownload-artifact@v4
-#       with
-#         name dragon-text-file
-
-#     - name read file
-#       run cat dragon.txt
-
-################################################## 09 variables and secres ##################################################
-
-# name Exploring variables and secrets
-
-# on push
-
-# # this is workflow variables
-# env
-#     CONTAINER_REGISTERY docker.io
-#     IMAGE_NAME github-actions
-
-# jobs
-#   docker
-#     runs-on ubuntu-latest
-#     steps
-#     - name docker build
-#       run echo docker build -t ${{ env.CONTAINER_REGISTERY }}${{ vars.DOCKER_USERNAME }}$IMAGE_NAMElatest  # DOCKER_USERNAME is created at repo
-
-#     - name docker login
-#       # env
-#       #   DOCKER_PASSWORD
-#       run echo docker login --username=$${{ vars.DOCKER_USERNAME }} --pasword=${{ secrets.DOCKER_PASSWORD}} # DOCKER_PASSWORD is created at repo
-
-#     - name docker publish
-#       run echo docker push $CONTAINER_REGISTERY${{ vars.DOCKER_USERNAME }}$IMAGE_NAMElatest
-
-#   deploy
-#     needs docker
-#     runs-on ubuntu-latest
-#     steps
-
-#     - name docker run
-#       run echo docker run -d -p 808080 $CONTAINER_REGISTERY${{ vars.DOCKER_USERNAME }}$IMAGE_NAMElatest
-
-# ################################################## 10- schedual  ##################################################
-
-# name usign schedual
+# # name my first workflow
 
 # # on push
-# on
-#   schedule
-#     - cron 1     ## ever 1 min
 
-# env
-#     CONTAINER_REGISTERY docker.io
-#     IMAGE_NAME github-actions
+# # jobs
+# #   first_job
+# #     runs-on ubuntu-latest
+# #     steps
+# #     - name welcome message
+# #       run echo my first github actions job
 
-# jobs
-#   docker
-#     runs-on ubuntu-latest
-#     steps
-#     - name docker build
-#       run echo docker build -t ${{ env.CONTAINER_REGISTERY }}${{ vars.DOCKER_USERNAME }}$IMAGE_NAMElatest
+# #     - name list files
+# #       run ls
 
-#     - name docker login
-#       # env
-#       #   DOCKER_PASSWORD
-#       run echo docker login --username=$${{ vars.DOCKER_USERNAME }} --pasword=${{ secrets.DOCKER_PASSWORD}}
+# #     - name read the file
+# #       run cat README.md
 
-#     - name docker publish
-#       run echo docker push $CONTAINER_REGISTERY${{ vars.DOCKER_USERNAME }}$IMAGE_NAMElatest
+# ################################################## 02 use checkout action ##################################################
 
-#   deploy
-#     needs docker
-#     runs-on ubuntu-latest
-#     steps
-
-#     - name docker run
-#       run echo docker run -d -p 808080 $CONTAINER_REGISTERY${{ vars.DOCKER_USERNAME }}$IMAGE_NAMElatest
-################################################## 11- workflow_dispatch  ##################################################
-
-# name workflow_dispatch
+# # name my first workflow
 
 # # on push
-# on
-#   workflow_dispatch
 
-# env
-#     CONTAINER_REGISTERY docker.io
-#     IMAGE_NAME github-actions
+# # jobs
+# #   first_job
+# #     runs-on ubuntu-latest
+# #     steps
+# #     - name Checkout Repo
+# #       uses actionscheckout@v4
 
-# jobs
-#   docker
-#     runs-on ubuntu-latest
-#     steps
-#     - name docker build
-#       run echo docker build -t ${{ env.CONTAINER_REGISTERY }}${{ vars.DOCKER_USERNAME }}$IMAGE_NAMElatest
+# #     - name welcome message
+# #       run echo my first github actions job
 
-#     - name docker login
-#       # env
-#       #   DOCKER_PASSWORD
-#       run echo docker login --username=$${{ vars.DOCKER_USERNAME }} --pasword=${{ secrets.DOCKER_PASSWORD}}
+# #     - name list files
+# #       run ls
 
-#     - name docker publish
-#       run echo docker push $CONTAINER_REGISTERY${{ vars.DOCKER_USERNAME }}$IMAGE_NAMElatest
+# #     - name read the file
+# #       run cat README.md
 
-#   deploy
-#     needs docker
-#     runs-on ubuntu-latest
-#     steps
+# ################################################## 03 Multi-Line commands and Executing Third Party Libraries ##################################################
 
-#     - name docker run
-#       run echo docker run -d -p 808080 $CONTAINER_REGISTERY${{ vars.DOCKER_USERNAME }}$IMAGE_NAMElatest
+# # name my first workflow
 
-################################################## 12- Job concurrency  ##################################################
+# # on push
 
-# name Job concurrency
+# # jobs
+# #   first_job
+# #     runs-on ubuntu-latest
+# #     steps
+# #     - name Checkout Repo
+# #       uses actionscheckout@v4
 
-# on push
+# #     - name list files and read files
+# #       run
+# #         echo my first github actions job
+# #         ls -lta
+# #         cat README.md
 
-# env
-#     CONTAINER_REGISTERY docker.io
-#     IMAGE_NAME github-actions
+# #     - name generate ASCII artwork
+# #       run cowsay -f dargon Run for cover, I am a dragon ... RARW  dragon.txt
 
-# jobs
-#   docker
-#     runs-on ubuntu-latest
-#     steps
-#     - name docker build
-#       run echo docker build -t ${{ env.CONTAINER_REGISTERY }}${{ vars.DOCKER_USERNAME }}$IMAGE_NAMElatest
+# ################################################## 04 Workflow to Generate ASCII Artwork ##################################################
 
-#     - name docker login
-#       # env
-#       #   DOCKER_PASSWORD
-#       run echo docker login --username=$${{ vars.DOCKER_USERNAME }} --pasword=${{ secrets.DOCKER_PASSWORD}}
+# # name my first workflow
 
-#     - name docker publish
-#       run echo docker push $CONTAINER_REGISTERY${{ vars.DOCKER_USERNAME }}$IMAGE_NAMElatest
+# # on push
 
-#   deploy
-#     needs docker
-#     concurrency
-#       group production-deployment
-#       cancel-in-progress true  ## dah el default , momken a5leeha false
-#     runs-on ubuntu-latest
-#     steps
+# # jobs
+# #   first_job
+# #     runs-on ubuntu-latest
+# #     steps
+# #     - name Checkout Repo
+# #       uses actionscheckout@v4
 
-#     - name docker run
-#       run
-#         echo docker run -d -p 808080 $CONTAINER_REGISTERY${{ vars.DOCKER_USERNAME }}$IMAGE_NAMElatest
-#         sleep 600
+# #     - name install cosway app
+# #       run sudo apt-get install cowsay  -y
 
-################################################## 13- Job concurrency false and timeout-minutes 1min ##################################################
+# #     - name generate ASCII artwork
+# #       run echo 5ali balak el dragon is here  dragon.txt
 
-# name Job concurrency and timeout
+# #     - name test files exists
+# #       run cat dragon.txt  grep -i dragon
 
-# on push
+# #     - name List Repo files
+# #       run ls -ltra
 
-# env
-#     CONTAINER_REGISTERY docker.io
-#     IMAGE_NAME github-actions
+# ################################################## 05 Executing Shell Scripts in Workflow ##################################################
 
-# jobs
-#   docker
-#     runs-on ubuntu-latest
-#     steps
-#     - name docker build
-#       run echo docker build -t ${{ env.CONTAINER_REGISTERY }}${{ vars.DOCKER_USERNAME }}$IMAGE_NAMElatest
+# # name my first workflow
 
-#     - name docker login
-#       # env
-#       #   DOCKER_PASSWORD
-#       run echo docker login --username=$${{ vars.DOCKER_USERNAME }} --pasword=${{ secrets.DOCKER_PASSWORD}}
+# # on push
 
-#     - name docker publish
-#       run echo docker push $CONTAINER_REGISTERY${{ vars.DOCKER_USERNAME }}$IMAGE_NAMElatest
+# # jobs
+# #   first_job
+# #     runs-on ubuntu-latest
+# #     steps
+# #     - name Checkout Repo
+# #       uses actionscheckout@v4
 
-#   deploy
-#     needs docker
-#     concurrency
-#       group production-deployment
-#       cancel-in-progress false  ## dah el default , momken a5leeha false
-#     runs-on ubuntu-latest
-#     steps
+# #     - name List Repo files
+# #       run ls -ltra
 
-#     - name docker run
-#       timeout-minutes 1
-#       run
-#         echo docker run -d -p 808080 $CONTAINER_REGISTERY${{ vars.DOCKER_USERNAME }}$IMAGE_NAMElatest
-#         sleep 6000
+# #     - name Executing shell script
+# #       run
+# #         chmod +x cowsay.sh
+# #         .cowsay.sh
 
-################################################## 14- without Matrix config ##################################################
-# # with matrix you will repeat the code , we have two jobs will be run in parrallel
-# name without Matrix config
+# ################################################## 06 Workflow with multiple Jobs ##################################################
 
-# on push
-# jobs
-#   deploy_on_ubuntu
-#     runs-on ubuntu-latest
-#     steps
-#     - name Echo docker detatils
-#       run docker info
+# # name Workflow with multiple Jobs
 
-#     - name Run images
-#       run docker run hello-world
+# # on push
 
-#   deploy_on_windows
-#     runs-on windows-latest
-#     steps
-#     - name Echo docker detatils
-#       run docker info
+# # jobs
+# #   build_job_1
+# #     runs-on ubuntu-latest
+# #     steps
+# #     - name install cosway
+# #       run sudo apt-get install cowsay -y
 
-#     - name Run images
-#       run docker run hello-world
+# #     - name generate ASCII artwork
+# #       run cowsay -f dragon Run for cover, I am a dragon ... RARW  dragon.txt
 
-################################################## 15- with Matrix config ##################################################
+# #     - name sleep for 30 sec
+# #       run sleep 30
 
-# name Matrix config
+# #   test_job_2
+# #     runs-on ubuntu-latest
+# #     steps
 
-# on push
-# jobs
-#   deploy
-#     strategy
-#       matrix
-#         os [ubuntu-latest,ubuntu-20.04, windows-latest]
-#         images [hello-world, alpine]
-#     runs-on ${{ matrix.os }}
-#     steps
-#     - name Echo docker detatils
-#       run docker info
+# #     - name sleep for 10 sec
+# #       run sleep 10
 
-#     - name Run images on ${{ matrix.os }}
-#       run docker run ${{ matrix.images }}
+# #     - name test file exists
+# #       run grep -i dragon dragon.txt
 
-################################################## 16- with Matrix with include and exclude ##################################################
+# #   deploy_job_3
+# #     runs-on ubuntu-latest
+# #     steps
+# #     - name read file
+# #       run cat dragon.txt
 
-# name Matrix config with include and exclude
+# #     - name Deploy
+# #       run echo deploying
 
-# on push
-# jobs
-#   deploy
-#     strategy
-#       fail-fast false
-#       max-parallel 2
-#       matrix
-#         os [ubuntu-latest, ubuntu-20.04, windows-latest]
-#         images [hello-world, alpine]
-#         exclude
-#           - images alpine
-#             os windows-latest
-#         include
-#           - images amd64alpine
-#             os ubuntu-20.04
-#     runs-on ${{ matrix.os }}
-#     steps
-#     - name Echo docker detatils
-#       run docker info
+# ################################################## 07 Workflow with multiple Jobs with needs ##################################################
 
-#     - name Run images on ${{ matrix.os }}
-#       run docker run ${{ matrix.images }}
+# # name Workflow with multiple Jobs
 
-################################################## 17- gitub_job_steps_runner_secrets context ##################################################
+# # on push
 
-# name Context of gitub_job_steps_runner_secrets
+# # jobs
+# #   build_job_1
+# #     runs-on ubuntu-latest
+# #     steps
+# #     - name install cosway
+# #       run sudo apt-get install cowsay -y
 
-# on push
-# jobs
-#   dump_contexts_to_logs
-#     runs-on ubuntu-latest
-#     steps
-#     - name Dumb github context
-#       env
-#         GITHUB_CONTEXT ${{ toJson(github) }}
-#       run echo $GITHUB_CONTEXT
+# #     - name generate ASCII artwork
+# #       run cowsay -f dragon Run for cover, I am a dragon ... RARW  dragon.txt
 
-#     - name Dumb job context
-#       env
-#         JOB_CONTEXT ${{ toJson(job) }}
-#       run echo $JOB_CONTEXT
-#     - name Dumb steps context
-#       env
-#         STEPS_CONTEXT ${{ toJson(steps) }}
-#       run echo $STEPS_CONTEXT
-#     - name Dumb runner context
-#       env
-#         RUNNER_CONTEXT ${{ toJson(runner) }}
-#       run echo $RUNNER_CONTEXT
-#     - name Dumb secrets context
-#       env
-#         SECRETS_CONTEXT ${{ toJson(secrets) }}
-#       run echo $SECRETS_CONTEXT
+# #     - name sleep for 30 sec
+# #       run sleep 30
 
-################################################## 18- if expression ##################################################
+# #   test_job_2
+# #     needs build_job_1
+# #     runs-on ubuntu-latest
+# #     steps
+# #     - name sleep for 10 sec
+# #       run sleep 10
 
-# name if expression in deploy job
+# #     - name test file exists
+# #       run grep -i dragon dragon.txt
 
-# on push
+# #   deploy_job_3
+# #     needs test_job_2
+# #     runs-on ubuntu-latest
+# #     steps
+# #     - name read file
+# #       run cat dragon.txt
 
-# env
-#     CONTAINER_REGISTERY docker.io
-#     IMAGE_NAME github-actions
+# #     - name Deploy
+# #       run echo deploying
 
-# jobs
-#   docker
-#     runs-on ubuntu-latest
-#     steps
-#     - name docker build
-#       run echo docker build -t ${{ env.CONTAINER_REGISTERY }}${{ vars.DOCKER_USERNAME }}$IMAGE_NAMElatest
+# ################################################## 08 cosway with needs then uplaod and download ##################################################
+# # name 08 cosway with needs then uplaod and download
 
-#     - name docker login
-#       # env
-#       #   DOCKER_PASSWORD
-#       run echo docker login --username=$${{ vars.DOCKER_USERNAME }} --pasword=${{ secrets.DOCKER_PASSWORD}}
+# # on push
 
-#     - name docker publish
-#       run echo docker push $CONTAINER_REGISTERY${{ vars.DOCKER_USERNAME }}$IMAGE_NAMElatest
+# # jobs
+# #   build_job_1
+# #     runs-on ubuntu-latest
+# #     steps
+# #     - name install cosway
+# #       run sudo apt-get install cowsay -y
 
-#   deploy
-#     if github.ref == 'refsheadsmain'
-#     needs docker
-#     runs-on ubuntu-latest
-#     steps
+# #     - name generate ASCII artwork
+# #       run cowsay -f dragon Run for cover, I am a dragon ... RARW  dragon.txt
 
-#     - name docker run
-#       run echo docker run -d -p 808080 $CONTAINER_REGISTERY${{ vars.DOCKER_USERNAME }}$IMAGE_NAMElatest
+# #     - name read file
+# #       run cat dragon.txt
 
-################################################## 19- Workflow Event Filters and Activity Types  ##################################################
+# #     - name upload the dragon.tx file to be downloaded after that from other jobs
+# #       uses actionsupload-artifact@v4
+# #       with
+# #         name dragon-text-file
+# #         path dragon.txt
 
-# name Workflow Event Filters and Activity Types
+# #     - name sleep for 10 sec
+# #       run sleep 10
 
-# on
-#   push
-#     branches
-#       - main
-#       - '!feature'
+# #   test_job_2
+# #     needs build_job_1
+# #     runs-on ubuntu-latest
+# #     steps
 
-#     # branches-ignore
-#     #   - '!feature'
-#     #   - test
+# #     - name sleep for 10 sec
+# #       run sleep 10
 
-#   pull_request
-#     types
-#       - opened
-#       - closed
-#     path_ignore
-#       - README.md
+# #     - name download  the dragon.tx file to cat it
+# #       uses actionsdownload-artifact@v4
+# #       with
+# #         name dragon-text-file
 
-#     branches
-#       - main
+# #     - name test file exists
+# #       run grep -i dragon dragon.txt
 
-# env
-#     CONTAINER_REGISTERY docker.io
-#     IMAGE_NAME github-actions
+# #   deploy_job_3
+# #     needs [build_job_1, test_job_2]
+# #     runs-on ubuntu-latest
+# #     steps
+# #     - name download  the dragon.tx file to cat it
+# #       uses actionsdownload-artifact@v4
+# #       with
+# #         name dragon-text-file
 
-# jobs
-#   docker
-#     runs-on ubuntu-latest
-#     steps
-#     - name docker build
-#       run echo docker build -t ${{ env.CONTAINER_REGISTERY }}${{ vars.DOCKER_USERNAME }}$IMAGE_NAMElatest
+# #     - name read file
+# #       run cat dragon.txt
 
-#     - name docker login
-#       # env
-#       #   DOCKER_PASSWORD
-#       run echo docker login --username=$${{ vars.DOCKER_USERNAME }} --pasword=${{ secrets.DOCKER_PASSWORD}}
+# ################################################## 09 variables and secres ##################################################
 
-#     - name docker publish
-#       run echo docker push $CONTAINER_REGISTERY${{ vars.DOCKER_USERNAME }}$IMAGE_NAMElatest
+# # name Exploring variables and secrets
 
-#   deploy
-#     if github.ref == 'refsheadsmain'
-#     needs docker
-#     runs-on ubuntu-latest
-#     steps
+# # on push
 
-#     - name docker run
-#       run echo docker run -d -p 808080 $CONTAINER_REGISTERY${{ vars.DOCKER_USERNAME }}$IMAGE_NAMElatest
+# # # this is workflow variables
+# # env
+# #     CONTAINER_REGISTERY docker.io
+# #     IMAGE_NAME github-actions
 
-========================================================================================== Tal5ees github actions kodekloud CI part 02
-# ================================================= 01 checkout setupnodejs_version Install_Dependencies ===================
+# # jobs
+# #   docker
+# #     runs-on ubuntu-latest
+# #     steps
+# #     - name docker build
+# #       run echo docker build -t ${{ env.CONTAINER_REGISTERY }}${{ vars.DOCKER_USERNAME }}$IMAGE_NAMElatest  # DOCKER_USERNAME is created at repo
+
+# #     - name docker login
+# #       # env
+# #       #   DOCKER_PASSWORD
+# #       run echo docker login --username=$${{ vars.DOCKER_USERNAME }} --pasword=${{ secrets.DOCKER_PASSWORD}} # DOCKER_PASSWORD is created at repo
+
+# #     - name docker publish
+# #       run echo docker push $CONTAINER_REGISTERY${{ vars.DOCKER_USERNAME }}$IMAGE_NAMElatest
+
+# #   deploy
+# #     needs docker
+# #     runs-on ubuntu-latest
+# #     steps
+
+# #     - name docker run
+# #       run echo docker run -d -p 808080 $CONTAINER_REGISTERY${{ vars.DOCKER_USERNAME }}$IMAGE_NAMElatest
+
+# # ################################################## 10- schedual  ##################################################
+
+# # name usign schedual
+
+# # # on push
+# # on
+# #   schedule
+# #     - cron 1     ## ever 1 min
+
+# # env
+# #     CONTAINER_REGISTERY docker.io
+# #     IMAGE_NAME github-actions
+
+# # jobs
+# #   docker
+# #     runs-on ubuntu-latest
+# #     steps
+# #     - name docker build
+# #       run echo docker build -t ${{ env.CONTAINER_REGISTERY }}${{ vars.DOCKER_USERNAME }}$IMAGE_NAMElatest
+
+# #     - name docker login
+# #       # env
+# #       #   DOCKER_PASSWORD
+# #       run echo docker login --username=$${{ vars.DOCKER_USERNAME }} --pasword=${{ secrets.DOCKER_PASSWORD}}
+
+# #     - name docker publish
+# #       run echo docker push $CONTAINER_REGISTERY${{ vars.DOCKER_USERNAME }}$IMAGE_NAMElatest
+
+# #   deploy
+# #     needs docker
+# #     runs-on ubuntu-latest
+# #     steps
+
+# #     - name docker run
+# #       run echo docker run -d -p 808080 $CONTAINER_REGISTERY${{ vars.DOCKER_USERNAME }}$IMAGE_NAMElatest
+# ################################################## 11- workflow_dispatch  ##################################################
+
+# # name workflow_dispatch
+
+# # # on push
+# # on
+# #   workflow_dispatch
+
+# # env
+# #     CONTAINER_REGISTERY docker.io
+# #     IMAGE_NAME github-actions
+
+# # jobs
+# #   docker
+# #     runs-on ubuntu-latest
+# #     steps
+# #     - name docker build
+# #       run echo docker build -t ${{ env.CONTAINER_REGISTERY }}${{ vars.DOCKER_USERNAME }}$IMAGE_NAMElatest
+
+# #     - name docker login
+# #       # env
+# #       #   DOCKER_PASSWORD
+# #       run echo docker login --username=$${{ vars.DOCKER_USERNAME }} --pasword=${{ secrets.DOCKER_PASSWORD}}
+
+# #     - name docker publish
+# #       run echo docker push $CONTAINER_REGISTERY${{ vars.DOCKER_USERNAME }}$IMAGE_NAMElatest
+
+# #   deploy
+# #     needs docker
+# #     runs-on ubuntu-latest
+# #     steps
+
+# #     - name docker run
+# #       run echo docker run -d -p 808080 $CONTAINER_REGISTERY${{ vars.DOCKER_USERNAME }}$IMAGE_NAMElatest
+
+# ################################################## 12- Job concurrency  ##################################################
+
+# # name Job concurrency
+
+# # on push
+
+# # env
+# #     CONTAINER_REGISTERY docker.io
+# #     IMAGE_NAME github-actions
+
+# # jobs
+# #   docker
+# #     runs-on ubuntu-latest
+# #     steps
+# #     - name docker build
+# #       run echo docker build -t ${{ env.CONTAINER_REGISTERY }}${{ vars.DOCKER_USERNAME }}$IMAGE_NAMElatest
+
+# #     - name docker login
+# #       # env
+# #       #   DOCKER_PASSWORD
+# #       run echo docker login --username=$${{ vars.DOCKER_USERNAME }} --pasword=${{ secrets.DOCKER_PASSWORD}}
+
+# #     - name docker publish
+# #       run echo docker push $CONTAINER_REGISTERY${{ vars.DOCKER_USERNAME }}$IMAGE_NAMElatest
+
+# #   deploy
+# #     needs docker
+# #     concurrency
+# #       group production-deployment
+# #       cancel-in-progress true  ## dah el default , momken a5leeha false
+# #     runs-on ubuntu-latest
+# #     steps
+
+# #     - name docker run
+# #       run
+# #         echo docker run -d -p 808080 $CONTAINER_REGISTERY${{ vars.DOCKER_USERNAME }}$IMAGE_NAMElatest
+# #         sleep 600
+
+# ################################################## 13- Job concurrency false and timeout-minutes 1min ##################################################
+
+# # name Job concurrency and timeout
+
+# # on push
+
+# # env
+# #     CONTAINER_REGISTERY docker.io
+# #     IMAGE_NAME github-actions
+
+# # jobs
+# #   docker
+# #     runs-on ubuntu-latest
+# #     steps
+# #     - name docker build
+# #       run echo docker build -t ${{ env.CONTAINER_REGISTERY }}${{ vars.DOCKER_USERNAME }}$IMAGE_NAMElatest
+
+# #     - name docker login
+# #       # env
+# #       #   DOCKER_PASSWORD
+# #       run echo docker login --username=$${{ vars.DOCKER_USERNAME }} --pasword=${{ secrets.DOCKER_PASSWORD}}
+
+# #     - name docker publish
+# #       run echo docker push $CONTAINER_REGISTERY${{ vars.DOCKER_USERNAME }}$IMAGE_NAMElatest
+
+# #   deploy
+# #     needs docker
+# #     concurrency
+# #       group production-deployment
+# #       cancel-in-progress false  ## dah el default , momken a5leeha false
+# #     runs-on ubuntu-latest
+# #     steps
+
+# #     - name docker run
+# #       timeout-minutes 1
+# #       run
+# #         echo docker run -d -p 808080 $CONTAINER_REGISTERY${{ vars.DOCKER_USERNAME }}$IMAGE_NAMElatest
+# #         sleep 6000
+
+# ################################################## 14- without Matrix config ##################################################
+# # # with matrix you will repeat the code , we have two jobs will be run in parrallel
+# # name without Matrix config
+
+# # on push
+# # jobs
+# #   deploy_on_ubuntu
+# #     runs-on ubuntu-latest
+# #     steps
+# #     - name Echo docker detatils
+# #       run docker info
+
+# #     - name Run images
+# #       run docker run hello-world
+
+# #   deploy_on_windows
+# #     runs-on windows-latest
+# #     steps
+# #     - name Echo docker detatils
+# #       run docker info
+
+# #     - name Run images
+# #       run docker run hello-world
+
+# ################################################## 15- with Matrix config ##################################################
+
+# # name Matrix config
+
+# # on push
+# # jobs
+# #   deploy
+# #     strategy
+# #       matrix
+# #         os [ubuntu-latest,ubuntu-20.04, windows-latest]
+# #         images [hello-world, alpine]
+# #     runs-on ${{ matrix.os }}
+# #     steps
+# #     - name Echo docker detatils
+# #       run docker info
+
+# #     - name Run images on ${{ matrix.os }}
+# #       run docker run ${{ matrix.images }}
+
+# ################################################## 16- with Matrix with include and exclude ##################################################
+
+# # name Matrix config with include and exclude
+
+# # on push
+# # jobs
+# #   deploy
+# #     strategy
+# #       fail-fast false
+# #       max-parallel 2
+# #       matrix
+# #         os [ubuntu-latest, ubuntu-20.04, windows-latest]
+# #         images [hello-world, alpine]
+# #         exclude
+# #           - images alpine
+# #             os windows-latest
+# #         include
+# #           - images amd64alpine
+# #             os ubuntu-20.04
+# #     runs-on ${{ matrix.os }}
+# #     steps
+# #     - name Echo docker detatils
+# #       run docker info
+
+# #     - name Run images on ${{ matrix.os }}
+# #       run docker run ${{ matrix.images }}
+
+# ################################################## 17- gitub_job_steps_runner_secrets context ##################################################
+
+# # name Context of gitub_job_steps_runner_secrets
+
+# # on push
+# # jobs
+# #   dump_contexts_to_logs
+# #     runs-on ubuntu-latest
+# #     steps
+# #     - name Dumb github context
+# #       env
+# #         GITHUB_CONTEXT ${{ toJson(github) }}
+# #       run echo $GITHUB_CONTEXT
+
+# #     - name Dumb job context
+# #       env
+# #         JOB_CONTEXT ${{ toJson(job) }}
+# #       run echo $JOB_CONTEXT
+# #     - name Dumb steps context
+# #       env
+# #         STEPS_CONTEXT ${{ toJson(steps) }}
+# #       run echo $STEPS_CONTEXT
+# #     - name Dumb runner context
+# #       env
+# #         RUNNER_CONTEXT ${{ toJson(runner) }}
+# #       run echo $RUNNER_CONTEXT
+# #     - name Dumb secrets context
+# #       env
+# #         SECRETS_CONTEXT ${{ toJson(secrets) }}
+# #       run echo $SECRETS_CONTEXT
+
+# ################################################## 18- if expression ##################################################
+
+# # name if expression in deploy job
+
+# # on push
+
+# # env
+# #     CONTAINER_REGISTERY docker.io
+# #     IMAGE_NAME github-actions
+
+# # jobs
+# #   docker
+# #     runs-on ubuntu-latest
+# #     steps
+# #     - name docker build
+# #       run echo docker build -t ${{ env.CONTAINER_REGISTERY }}${{ vars.DOCKER_USERNAME }}$IMAGE_NAMElatest
+
+# #     - name docker login
+# #       # env
+# #       #   DOCKER_PASSWORD
+# #       run echo docker login --username=$${{ vars.DOCKER_USERNAME }} --pasword=${{ secrets.DOCKER_PASSWORD}}
+
+# #     - name docker publish
+# #       run echo docker push $CONTAINER_REGISTERY${{ vars.DOCKER_USERNAME }}$IMAGE_NAMElatest
+
+# #   deploy
+# #     if github.ref == 'refsheadsmain'
+# #     needs docker
+# #     runs-on ubuntu-latest
+# #     steps
+
+# #     - name docker run
+# #       run echo docker run -d -p 808080 $CONTAINER_REGISTERY${{ vars.DOCKER_USERNAME }}$IMAGE_NAMElatest
+
+# ################################################## 19- Workflow Event Filters and Activity Types  ##################################################
+
+# # name Workflow Event Filters and Activity Types
+
+# # on
+# #   push
+# #     branches
+# #       - main
+# #       - '!feature'
+
+# #     # branches-ignore
+# #     #   - '!feature'
+# #     #   - test
+
+# #   pull_request
+# #     types
+# #       - opened
+# #       - closed
+# #     path_ignore
+# #       - README.md
+
+# #     branches
+# #       - main
+
+# # env
+# #     CONTAINER_REGISTERY docker.io
+# #     IMAGE_NAME github-actions
+
+# # jobs
+# #   docker
+# #     runs-on ubuntu-latest
+# #     steps
+# #     - name docker build
+# #       run echo docker build -t ${{ env.CONTAINER_REGISTERY }}${{ vars.DOCKER_USERNAME }}$IMAGE_NAMElatest
+
+# #     - name docker login
+# #       # env
+# #       #   DOCKER_PASSWORD
+# #       run echo docker login --username=$${{ vars.DOCKER_USERNAME }} --pasword=${{ secrets.DOCKER_PASSWORD}}
+
+# #     - name docker publish
+# #       run echo docker push $CONTAINER_REGISTERY${{ vars.DOCKER_USERNAME }}$IMAGE_NAMElatest
+
+# #   deploy
+# #     if github.ref == 'refsheadsmain'
+# #     needs docker
+# #     runs-on ubuntu-latest
+# #     steps
+
+# #     - name docker run
+# #       run echo docker run -d -p 808080 $CONTAINER_REGISTERY${{ vars.DOCKER_USERNAME }}$IMAGE_NAMElatest
+
+# #========================================================================================== Tal5ees github actions kodekloud CI part 02
+# # ================================================= 01 checkout setupnodejs_version Install_Dependencies ===================
+# # ---
+# #   name: Solar System Workflow
+# #   on:
+# #     workflow_dispatch: null
+# #     push:
+# #       branches:
+# #         - main
+# #         - feature/*
+# #   env:
+# #     MONGO_URI: mongodb+srv://supercluster.d83jj.mongodb.net/superData
+# #     MONGO_USERNAME: superuser
+# #     MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
+# #   jobs:
+# #     unit-testing:
+# #       name: Unit Testing
+# #       runs-on: ubuntu-latest
+# #       steps:
+# #         - name: Checkout Repository
+# #           uses: actions/checkout@v4
+# #         - name: Setup NodeJS Version
+# #           uses: actions/setup-node@v3
+# #           with:
+# #             node-version: 20
+# #         - name: Install Dependencies
+# #           run: npm install
+# #         - name: Unit Testing
+# #           run: npm test
+# #         - name: Archive Test Result
+# #           uses: actions/upload-artifact@v3
+# #           with:
+# #             name: Mocha-Test-Result
+# #             path: test-results.xml
+# # ================================================= 02 checkout setupnodejs_version Install_Dependencies if_always ===================
+# # ---
+# #   name: if_always
+# #   on:
+# #     workflow_dispatch: null
+# #     push:
+# #       branches:
+# #         - main
+# #         - feature/*
+# #   env:
+# #     MONGO_URI: mongodb+srv://supercluster.d83jj.mongodb.net/superData
+# #     MONGO_USERNAME: superuser
+# #     MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
+# #   jobs:
+# #     unit-testing:
+# #       name: Unit Testing
+# #       runs-on: ubuntu-latest
+# #       steps:
+# #         - name: Checkout Repository
+# #           uses: actions/checkout@v4
+# #         - name: Setup NodeJS Version
+# #           uses: actions/setup-node@v3
+# #           with:
+# #             node-version: 20
+# #         - name: Install Dependencies
+# #           run: npm install
+# #         - name: Unit Testing
+# #           run: npm test
+# #         - name: Archive Test Result
+# #           if: always() #added
+# #           uses: actions/upload-artifact@v3
+# #           with:
+# #             name: Mocha-Test-Result
+# #             path: test-results.xml
+# # ================================================= 03 checkout setupnodejs_version Install_Dependencies if_always code_coverage ===================
+# # ---
+# #   name: code_coverage
+# #   on:
+# #     workflow_dispatch: null
+# #     push:
+# #       branches:
+# #         - main
+# #         - feature/*
+# #   env:
+# #     MONGO_URI: mongodb+srv://supercluster.d83jj.mongodb.net/superData
+# #     MONGO_USERNAME: superuser
+# #     MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
+# #   jobs:
+# #     unit-testing:
+# #       name: Unit Testing
+# #       runs-on: ubuntu-latest
+# #       steps:
+# #         - name: Checkout Repository
+# #           uses: actions/checkout@v4
+# #         - name: Setup NodeJS Version
+# #           uses: actions/setup-node@v3
+# #           with:
+# #             node-version: 20
+# #         - name: Install Dependencies
+# #           run: npm install
+# #         - name: Unit Testing
+# #           run: npm test
+# #         - name: Archive Test Result
+# #           if: always() #added
+# #           uses: actions/upload-artifact@v3
+# #           with:
+# #             name: Mocha-Test-Result
+# #             path: test-results.xml
+
+# #     code-coverage:
+# #       runs-on: ubuntu-latest
+# #       steps:
+# #         - uses: actions/checkout@v4
+# #         - uses: actions/setup-node@v3
+# #           with:
+# #             node-version: 18
+# #         - run: npm install
+# #         - continue-on-error: true
+# #           run: npm run coverage
+# #         - uses: actions/upload-artifact@v3
+# #           with:
+# #             name: Code-Coverage-Result
+# #             path: coverage
+# #             retention-days: 5
+
+# # ================================================= 04-docker ===================
+# # ---
+# #   name: docker
+# #   on:
+# #     workflow_dispatch: null
+# #     push:
+# #       branches:
+# #         - main
+# #         - feature/*
+# #   env:
+# #     MONGO_URI: mongodb+srv://supercluster.d83jj.mongodb.net/superData
+# #     MONGO_USERNAME: superuser
+# #     MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
+# #   jobs:
+# #     unit-testing:
+# #       name: Unit Testing
+# #       runs-on: ubuntu-latest
+# #       steps:
+# #         - name: Checkout Repository
+# #           uses: actions/checkout@v4
+# #         - name: Setup NodeJS Version
+# #           uses: actions/setup-node@v3
+# #           with:
+# #             node-version: 20
+# #         - name: Install Dependencies
+# #           run: npm install
+# #         - name: Unit Testing
+# #           run: npm test
+# #         - name: Archive Test Result
+# #           if: always() #added
+# #           uses: actions/upload-artifact@v3
+# #           with:
+# #             name: Mocha-Test-Result
+# #             path: test-results.xml
+
+# #     code-coverage:
+# #       runs-on: ubuntu-latest
+# #       steps:
+# #         - uses: actions/checkout@v4
+# #         - uses: actions/setup-node@v3
+# #           with:
+# #             node-version: 18
+# #         - run: npm install
+# #         - continue-on-error: true
+# #           run: npm run coverage
+# #         - uses: actions/upload-artifact@v3
+# #           with:
+# #             name: Code-Coverage-Result
+# #             path: coverage
+# #             retention-days: 5
+# #     docker:
+# #       name: Containerization
+# #       needs: [unit-testing,code-coverage]
+# #       runs-on: ubuntu-latest
+# #       steps:
+# #         - name: Checkout Repo
+# #           uses: actions/checkout@v4
+# #         - name: DockerHub Login
+# #           uses: docker/login-action@v2.2.0
+# #           with:
+# #             username: ${{ vars.DOCKERHUB_USERNAME }}
+# #             password: ${{ secrets.DOCKERHUB_PASSWORD }}
+# # ================================================= 05-docker build for testing step ===================
+# # ---
+# #   name: 05-docker build for testing step
+# #   on:
+# #     workflow_dispatch: null
+# #     push:
+# #       branches:
+# #         - main
+# #         - feature/*
+# #   env:
+# #     MONGO_URI: mongodb+srv://supercluster.d83jj.mongodb.net/superData
+# #     MONGO_USERNAME: superuser
+# #     MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
+# #   jobs:
+# #     unit-testing:
+# #       name: Unit Testing
+# #       runs-on: ubuntu-latest
+# #       steps:
+# #         - name: Checkout Repository
+# #           uses: actions/checkout@v4
+# #         - name: Setup NodeJS Version
+# #           uses: actions/setup-node@v3
+# #           with:
+# #             node-version: 20
+# #         - name: Install Dependencies
+# #           run: npm install
+# #         - name: Unit Testing
+# #           run: npm test
+# #         - name: Archive Test Result
+# #           if: always() #added
+# #           uses: actions/upload-artifact@v3
+# #           with:
+# #             name: Mocha-Test-Result
+# #             path: test-results.xml
+
+# #     code-coverage:
+# #       runs-on: ubuntu-latest
+# #       steps:
+# #         - uses: actions/checkout@v4
+# #         - uses: actions/setup-node@v3
+# #           with:
+# #             node-version: 18
+# #         - run: npm install
+# #         - continue-on-error: true
+# #           run: npm run coverage
+# #         - uses: actions/upload-artifact@v3
+# #           with:
+# #             name: Code-Coverage-Result
+# #             path: coverage
+# #             retention-days: 5
+
+# #     docker:
+# #       name: Containerization
+# #       needs: [unit-testing,code-coverage]
+# #       runs-on: ubuntu-latest
+# #       steps:
+# #         - name: Checkout Repo
+# #           uses: actions/checkout@v4
+
+# #         - name: DockerHub Login
+# #           uses: docker/login-action@v2.2.0
+# #           with:
+# #             username: ${{ vars.DOCKERHUB_USERNAME }}
+# #             password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+# #         - name: Docker build for testing
+# #           uses: docker/build-push-action@v2.2.0
+# #           with:
+# #             context: .
+# #             push: false
+# #             tag: ${{ vars.DOCKERHUB_USERNAME }}/solar-system:${{ github.sha}}
+
+# # # ================================================= 06-Docker image testing and push to dockerhub  ===================
+# # ---
+# # # name: 06-Docker image testing and push
+# # # on:
+# # #   workflow_dispatch: null
+# # #   push:
+# # #     branches:
+# # #       - main
+# # #       - feature/*
+# # # env:
+# # #   MONGO_URI: mongodb+srv://supercluster.d83jj.mongodb.net/superData
+# # #   MONGO_USERNAME: superuser
+# # #   MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
+# # # jobs:
+# # #   unit-testing:
+# # #     name: Unit Testing
+# # #     runs-on: ubuntu-latest
+# # #     steps:
+# #       - name: Checkout Repository
+# #         uses: actions/checkout@v4
+# #       - name: Setup NodeJS Version
+# #         uses: actions/setup-node@v3
+# #         with:
+# #           node-version: 20
+# #       - name: Install Dependencies
+# #         run: npm install
+# #       - name: Unit Testing
+# #         run: npm test
+# #       - name: Archive Test Result
+# #         if: always() #added
+# #         uses: actions/upload-artifact@v3
+# #         with:
+# #           name: Mocha-Test-Result
+# #           path: test-results.xml
+
+# #   code-coverage:
+# #     runs-on: ubuntu-latest
+# #     steps:
+# #       - uses: actions/checkout@v4
+# #       - uses: actions/setup-node@v3
+# #         with:
+# #           node-version: 18
+# #       - run: npm install
+# #       - continue-on-error: true
+# #         run: npm run coverage
+# #       - uses: actions/upload-artifact@v3
+# #         with:
+# #           name: Code-Coverage-Result
+# #           path: coverage
+# #           retention-days: 5
+
+# #   docker:
+# #     name: Containerization
+# #     needs: [unit-testing, code-coverage]
+# #     runs-on: ubuntu-latest
+# #     steps:
+# #       - name: Checkout Repo
+# #         uses: actions/checkout@v4
+
+# #       - name: DockerHub Login
+# #         uses: docker/login-action@v2
+# #         with:
+# #           username: ${{ vars.DOCKERHUB_USERNAME }}
+# #           password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+# #       - name: Docker build for testing
+# #         uses: docker/build-push-action@v4
+# #         with:
+# #           context: .
+# #           push: false
+# #           tags: ${{vars.DOCKERHUB_ACCOUNT}}/solar-system:${{ github.sha }}
+
+# #       - name: Docker image testing
+# #         run: |
+# #           # Check Docker images
+# #           docker images
+
+# #           # Run the Docker container with environment variables
+# #           docker run --name solar-system-app -d \
+# #             -p 3000:3000 \
+# #             -e MONGO_URI=$MONGO_URI \
+# #             -e MONGO_USERNAME=$MONGO_USERNAME \
+# #             -e MONGO_PASSWORD=$MONGO_PASSWORD \
+# #             ${{vars.DOCKERHUB_ACCOUNT}}/solar-system:${{ github.sha }}
+
+# #           # Sleep to give the container time to start
+# #           sleep 5
+
+# #           # Inspect IP and test connectivity
+# #           export IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' solar-system-app)
+# #           echo "Container IP: $IP"
+# #           echo "Testing Image URL using wget"
+# #           wget -q -O - http://127.0.0.1:3000/live | grep live
+
+# #       - name: Docker build and push
+# #         uses: docker/build-push-action@v3
+# #         with:
+# #           context: .
+# #           push: true
+# #           tags: ${{vars.DOCKERHUB_ACCOUNT}}/solar-system:${{ github.sha }}
+# # ================================================= 07-using cache  ===================
 # ---
-#   name: Solar System Workflow
-#   on:
-#     workflow_dispatch: null
-#     push:
-#       branches:
-#         - main
-#         - feature/*
-#   env:
-#     MONGO_URI: mongodb+srv://supercluster.d83jj.mongodb.net/superData
-#     MONGO_USERNAME: superuser
-#     MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
-#   jobs:
-#     unit-testing:
-#       name: Unit Testing
-#       runs-on: ubuntu-latest
-#       steps:
-#         - name: Checkout Repository
-#           uses: actions/checkout@v4
-#         - name: Setup NodeJS Version
-#           uses: actions/setup-node@v3
-#           with:
-#             node-version: 20
-#         - name: Install Dependencies
-#           run: npm install
-#         - name: Unit Testing
-#           run: npm test
-#         - name: Archive Test Result
-#           uses: actions/upload-artifact@v3
-#           with:
-#             name: Mocha-Test-Result
-#             path: test-results.xml
-# ================================================= 02 checkout setupnodejs_version Install_Dependencies if_always ===================
-# ---
-#   name: if_always
-#   on:
-#     workflow_dispatch: null
-#     push:
-#       branches:
-#         - main
-#         - feature/*
-#   env:
-#     MONGO_URI: mongodb+srv://supercluster.d83jj.mongodb.net/superData
-#     MONGO_USERNAME: superuser
-#     MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
-#   jobs:
-#     unit-testing:
-#       name: Unit Testing
-#       runs-on: ubuntu-latest
-#       steps:
-#         - name: Checkout Repository
-#           uses: actions/checkout@v4
-#         - name: Setup NodeJS Version
-#           uses: actions/setup-node@v3
-#           with:
-#             node-version: 20
-#         - name: Install Dependencies
-#           run: npm install
-#         - name: Unit Testing
-#           run: npm test
-#         - name: Archive Test Result
-#           if: always() #added
-#           uses: actions/upload-artifact@v3
-#           with:
-#             name: Mocha-Test-Result
-#             path: test-results.xml
-# ================================================= 03 checkout setupnodejs_version Install_Dependencies if_always code_coverage ===================
-# ---
-#   name: code_coverage
-#   on:
-#     workflow_dispatch: null
-#     push:
-#       branches:
-#         - main
-#         - feature/*
-#   env:
-#     MONGO_URI: mongodb+srv://supercluster.d83jj.mongodb.net/superData
-#     MONGO_USERNAME: superuser
-#     MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
-#   jobs:
-#     unit-testing:
-#       name: Unit Testing
-#       runs-on: ubuntu-latest
-#       steps:
-#         - name: Checkout Repository
-#           uses: actions/checkout@v4
-#         - name: Setup NodeJS Version
-#           uses: actions/setup-node@v3
-#           with:
-#             node-version: 20
-#         - name: Install Dependencies
-#           run: npm install
-#         - name: Unit Testing
-#           run: npm test
-#         - name: Archive Test Result
-#           if: always() #added
-#           uses: actions/upload-artifact@v3
-#           with:
-#             name: Mocha-Test-Result
-#             path: test-results.xml
+# # name: 07-using cache
+# # on:
+# #   workflow_dispatch: null
+# #   push:
+# #     branches:
+# #       - main
+# #       - feature/*
+# # env:
+# #   MONGO_URI: mongodb+srv://supercluster.d83jj.mongodb.net/superData
+# #   MONGO_USERNAME: superuser
+# #   MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
+# # jobs:
+# #   unit-testing:
+# #     name: Unit Testing
+# #     runs-on: ubuntu-latest
+# #     steps:
+# #       - name: Checkout Repository
+# #         uses: actions/checkout@v4
+# #       - name: Setup NodeJS Version
+# #         uses: actions/setup-node@v3
+# #         with:
+# #           node-version: 20
+# #       - name: Install Dependencies
+# #         run: npm install
 
-#     code-coverage:
-#       runs-on: ubuntu-latest
-#       steps:
-#         - uses: actions/checkout@v4
-#         - uses: actions/setup-node@v3
-#           with:
-#             node-version: 18
-#         - run: npm install
-#         - continue-on-error: true
-#           run: npm run coverage
-#         - uses: actions/upload-artifact@v3
-#           with:
-#             name: Code-Coverage-Result
-#             path: coverage
-#             retention-days: 5
+# #       - name: Cache NPM Dependencies
+# #         uses: actions/cache@v3
+# #         with:
+# #           path: node_modules
+# #           key: ${{ runner.os }}-node_modules-${{ hashFiles('package.json') }}
 
-# ================================================= 04-docker ===================
-# ---
-#   name: docker
-#   on:
-#     workflow_dispatch: null
-#     push:
-#       branches:
-#         - main
-#         - feature/*
-#   env:
-#     MONGO_URI: mongodb+srv://supercluster.d83jj.mongodb.net/superData
-#     MONGO_USERNAME: superuser
-#     MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
-#   jobs:
-#     unit-testing:
-#       name: Unit Testing
-#       runs-on: ubuntu-latest
-#       steps:
-#         - name: Checkout Repository
-#           uses: actions/checkout@v4
-#         - name: Setup NodeJS Version
-#           uses: actions/setup-node@v3
-#           with:
-#             node-version: 20
-#         - name: Install Dependencies
-#           run: npm install
-#         - name: Unit Testing
-#           run: npm test
-#         - name: Archive Test Result
-#           if: always() #added
-#           uses: actions/upload-artifact@v3
-#           with:
-#             name: Mocha-Test-Result
-#             path: test-results.xml
+# #       - name: Unit Testing
+# #         run: npm test
 
-#     code-coverage:
-#       runs-on: ubuntu-latest
-#       steps:
-#         - uses: actions/checkout@v4
-#         - uses: actions/setup-node@v3
-#           with:
-#             node-version: 18
-#         - run: npm install
-#         - continue-on-error: true
-#           run: npm run coverage
-#         - uses: actions/upload-artifact@v3
-#           with:
-#             name: Code-Coverage-Result
-#             path: coverage
-#             retention-days: 5
-#     docker:
-#       name: Containerization
-#       needs: [unit-testing,code-coverage]
-#       runs-on: ubuntu-latest
-#       steps:
-#         - name: Checkout Repo
-#           uses: actions/checkout@v4
-#         - name: DockerHub Login
-#           uses: docker/login-action@v2.2.0
-#           with:
-#             username: ${{ vars.DOCKERHUB_USERNAME }}
-#             password: ${{ secrets.DOCKERHUB_PASSWORD }}
-# ================================================= 05-docker build for testing step ===================
-# ---
-#   name: 05-docker build for testing step
-#   on:
-#     workflow_dispatch: null
-#     push:
-#       branches:
-#         - main
-#         - feature/*
-#   env:
-#     MONGO_URI: mongodb+srv://supercluster.d83jj.mongodb.net/superData
-#     MONGO_USERNAME: superuser
-#     MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
-#   jobs:
-#     unit-testing:
-#       name: Unit Testing
-#       runs-on: ubuntu-latest
-#       steps:
-#         - name: Checkout Repository
-#           uses: actions/checkout@v4
-#         - name: Setup NodeJS Version
-#           uses: actions/setup-node@v3
-#           with:
-#             node-version: 20
-#         - name: Install Dependencies
-#           run: npm install
-#         - name: Unit Testing
-#           run: npm test
-#         - name: Archive Test Result
-#           if: always() #added
-#           uses: actions/upload-artifact@v3
-#           with:
-#             name: Mocha-Test-Result
-#             path: test-results.xml
+# #       - name: Archive Test Result
+# #         if: always() #added
+# #         uses: actions/upload-artifact@v3
+# #         with:
+# #           name: Mocha-Test-Result
+# #           path: test-results.xml
 
-#     code-coverage:
-#       runs-on: ubuntu-latest
-#       steps:
-#         - uses: actions/checkout@v4
-#         - uses: actions/setup-node@v3
-#           with:
-#             node-version: 18
-#         - run: npm install
-#         - continue-on-error: true
-#           run: npm run coverage
-#         - uses: actions/upload-artifact@v3
-#           with:
-#             name: Code-Coverage-Result
-#             path: coverage
-#             retention-days: 5
+# #   code-coverage:
+# #     runs-on: ubuntu-latest
+# #     steps:
+# #       - uses: actions/checkout@v4
+# #       - uses: actions/setup-node@v3
+# #         with:
+# #           node-version: 18
 
-#     docker:
-#       name: Containerization
-#       needs: [unit-testing,code-coverage]
-#       runs-on: ubuntu-latest
-#       steps:
-#         - name: Checkout Repo
-#           uses: actions/checkout@v4
+# #       - name: Cache NPM Dependencies
+# #         uses: actions/cache@v3
+# #         with:
+# #           path: node_modules
+# #           key: ${{ runner.os }}-node_modules-${{ hashFiles('package.json') }}
 
-#         - name: DockerHub Login
-#           uses: docker/login-action@v2.2.0
-#           with:
-#             username: ${{ vars.DOCKERHUB_USERNAME }}
-#             password: ${{ secrets.DOCKERHUB_PASSWORD }}
+# #       - run: npm install
+# #       - continue-on-error: true
+# #         run: npm run coverage
+# #       - uses: actions/upload-artifact@v3
+# #         with:
+# #           name: Code-Coverage-Result
+# #           path: coverage
+# #           retention-days: 5
 
-#         - name: Docker build for testing
-#           uses: docker/build-push-action@v2.2.0
-#           with:
-#             context: .
-#             push: false
-#             tag: ${{ vars.DOCKERHUB_USERNAME }}/solar-system:${{ github.sha}}
+# #   docker:
+# #     name: Containerization
+# #     needs: [unit-testing, code-coverage]
+# #     runs-on: ubuntu-latest
+# #     steps:
+# #       - name: Checkout Repo
+# #         uses: actions/checkout@v4
 
-# ================================================= 06-Docker image testing and push to dockerhub  ===================
----
-# name: 06-Docker image testing and push
-# on:
-#   workflow_dispatch: null
-#   push:
-#     branches:
-#       - main
-#       - feature/*
-# env:
-#   MONGO_URI: mongodb+srv://supercluster.d83jj.mongodb.net/superData
-#   MONGO_USERNAME: superuser
-#   MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
-# jobs:
-#   unit-testing:
-#     name: Unit Testing
-#     runs-on: ubuntu-latest
-#     steps:
-#       - name: Checkout Repository
-#         uses: actions/checkout@v4
-#       - name: Setup NodeJS Version
-#         uses: actions/setup-node@v3
-#         with:
-#           node-version: 20
-#       - name: Install Dependencies
-#         run: npm install
-#       - name: Unit Testing
-#         run: npm test
-#       - name: Archive Test Result
-#         if: always() #added
-#         uses: actions/upload-artifact@v3
-#         with:
-#           name: Mocha-Test-Result
-#           path: test-results.xml
+# #       - name: DockerHub Login
+# #         uses: docker/login-action@v2
+# #         with:
+# #           username: ${{ vars.DOCKERHUB_USERNAME }}
+# #           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-#   code-coverage:
-#     runs-on: ubuntu-latest
-#     steps:
-#       - uses: actions/checkout@v4
-#       - uses: actions/setup-node@v3
-#         with:
-#           node-version: 18
-#       - run: npm install
-#       - continue-on-error: true
-#         run: npm run coverage
-#       - uses: actions/upload-artifact@v3
-#         with:
-#           name: Code-Coverage-Result
-#           path: coverage
-#           retention-days: 5
+# #       - name: Docker build for testing
+# #         uses: docker/build-push-action@v4
+# #         with:
+# #           context: .
+# #           push: false
+# #           tags: ${{vars.DOCKERHUB_ACCOUNT}}/solar-system:${{ github.sha }}
 
-#   docker:
-#     name: Containerization
-#     needs: [unit-testing, code-coverage]
-#     runs-on: ubuntu-latest
-#     steps:
-#       - name: Checkout Repo
-#         uses: actions/checkout@v4
+# #       - name: Docker image testing
+# #         run: |
+# #           # Check Docker images
+# #           docker images
 
-#       - name: DockerHub Login
-#         uses: docker/login-action@v2
-#         with:
-#           username: ${{ vars.DOCKERHUB_USERNAME }}
-#           password: ${{ secrets.DOCKERHUB_PASSWORD }}
+# #           # Run the Docker container with environment variables
+# #           docker run --name solar-system-app -d \
+# #             -p 3000:3000 \
+# #             -e MONGO_URI=$MONGO_URI \
+# #             -e MONGO_USERNAME=$MONGO_USERNAME \
+# #             -e MONGO_PASSWORD=$MONGO_PASSWORD \
+# #             ${{vars.DOCKERHUB_ACCOUNT}}/solar-system:${{ github.sha }}
 
-#       - name: Docker build for testing
-#         uses: docker/build-push-action@v4
-#         with:
-#           context: .
-#           push: false
-#           tags: ${{vars.DOCKERHUB_ACCOUNT}}/solar-system:${{ github.sha }}
+# #           # Sleep to give the container time to start
+# #           sleep 5
 
-#       - name: Docker image testing
-#         run: |
-#           # Check Docker images
-#           docker images
+# #           # Inspect IP and test connectivity
+# #           export IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' solar-system-app)
+# #           echo "Container IP: $IP"
+# #           echo "Testing Image URL using wget"
+# #           wget -q -O - http://127.0.0.1:3000/live | grep live
 
-#           # Run the Docker container with environment variables
-#           docker run --name solar-system-app -d \
-#             -p 3000:3000 \
-#             -e MONGO_URI=$MONGO_URI \
-#             -e MONGO_USERNAME=$MONGO_USERNAME \
-#             -e MONGO_PASSWORD=$MONGO_PASSWORD \
-#             ${{vars.DOCKERHUB_ACCOUNT}}/solar-system:${{ github.sha }}
+# #       - name: Docker build and push
+# #         uses: docker/build-push-action@v3
+# #         with:
+# #           context: .
+# #           push: true
+# #           tags: ${{vars.DOCKERHUB_ACCOUNT}}/solar-system:${{ github.sha }}
 
-#           # Sleep to give the container time to start
-#           sleep 5
+# # # ================================================= 08- Login and Push to GHCR  ===================
+# # ---
+# #   name: 08-Login and Push to GHCR
+# #   on:
+# #     workflow_dispatch: null
+# #     push:
+# #       branches:
+# #         - main
+# #         - feature/*
+# #   env:
+# #     MONGO_URI: mongodb+srv://supercluster.d83jj.mongodb.net/superData
+# #     MONGO_USERNAME: superuser
+# #     MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
+# #   jobs:
+# #     unit-testing:
+# #       name: Unit Testing
+# #       runs-on: ubuntu-latest
+# #       steps:
+# #         - name: Checkout Repository
+# #           uses: actions/checkout@v4
+# #         - name: Setup NodeJS Version
+# #           uses: actions/setup-node@v3
+# #           with:
+# #             node-version: 20
+# #         - name: Install Dependencies
+# #           run: npm install
 
-#           # Inspect IP and test connectivity
-#           export IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' solar-system-app)
-#           echo "Container IP: $IP"
-#           echo "Testing Image URL using wget"
-#           wget -q -O - http://127.0.0.1:3000/live | grep live
+# #         - name: Cache NPM Dependencies
+# #           uses: actions/cache@v3
+# #           with:
+# #             path: node_modules
+# #             key: ${{ runner.os }}-node_modules-${{ hashFiles('package.json') }}
 
-#       - name: Docker build and push
-#         uses: docker/build-push-action@v3
-#         with:
-#           context: .
-#           push: true
-#           tags: ${{vars.DOCKERHUB_ACCOUNT}}/solar-system:${{ github.sha }}
-# ================================================= 07-using cache  ===================
----
-# name: 07-using cache
-# on:
-#   workflow_dispatch: null
-#   push:
-#     branches:
-#       - main
-#       - feature/*
-# env:
-#   MONGO_URI: mongodb+srv://supercluster.d83jj.mongodb.net/superData
-#   MONGO_USERNAME: superuser
-#   MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
-# jobs:
-#   unit-testing:
-#     name: Unit Testing
-#     runs-on: ubuntu-latest
-#     steps:
-#       - name: Checkout Repository
-#         uses: actions/checkout@v4
-#       - name: Setup NodeJS Version
-#         uses: actions/setup-node@v3
-#         with:
-#           node-version: 20
-#       - name: Install Dependencies
-#         run: npm install
+# #         - name: Unit Testing
+# #           run: npm test
 
-#       - name: Cache NPM Dependencies
-#         uses: actions/cache@v3
-#         with:
-#           path: node_modules
-#           key: ${{ runner.os }}-node_modules-${{ hashFiles('package.json') }}
+# #         - name: Archive Test Result
+# #           if: always() #added
+# #           uses: actions/upload-artifact@v3
+# #           with:
+# #             name: Mocha-Test-Result
+# #             path: test-results.xml
 
-#       - name: Unit Testing
-#         run: npm test
+# #     code-coverage:
+# #       runs-on: ubuntu-latest
+# #       steps:
+# #         - uses: actions/checkout@v4
+# #         - uses: actions/setup-node@v3
+# #           with:
+# #             node-version: 18
 
-#       - name: Archive Test Result
-#         if: always() #added
-#         uses: actions/upload-artifact@v3
-#         with:
-#           name: Mocha-Test-Result
-#           path: test-results.xml
+# #         - name: Cache NPM Dependencies
+# #           uses: actions/cache@v3
+# #           with:
+# #             path: node_modules
+# #             key: ${{ runner.os }}-node_modules-${{ hashFiles('package.json') }}
 
-#   code-coverage:
-#     runs-on: ubuntu-latest
-#     steps:
-#       - uses: actions/checkout@v4
-#       - uses: actions/setup-node@v3
-#         with:
-#           node-version: 18
+# #         - run: npm install
+# #         - continue-on-error: true
+# #           run: npm run coverage
+# #         - uses: actions/upload-artifact@v3
+# #           with:
+# #             name: Code-Coverage-Result
+# #             path: coverage
+# #             retention-days: 5
 
-#       - name: Cache NPM Dependencies
-#         uses: actions/cache@v3
-#         with:
-#           path: node_modules
-#           key: ${{ runner.os }}-node_modules-${{ hashFiles('package.json') }}
+# #     docker:
+# #       name: Containerization
+# #       needs: [unit-testing, code-coverage]
+# #       permissions:
+# #         packages: write
+# #       runs-on: ubuntu-latest
+# #       steps:
+# #         - name: Checkout Repo
+# #           uses: actions/checkout@v4
 
-#       - run: npm install
-#       - continue-on-error: true
-#         run: npm run coverage
-#       - uses: actions/upload-artifact@v3
-#         with:
-#           name: Code-Coverage-Result
-#           path: coverage
-#           retention-days: 5
+# #         - name: DockerHub Login
+# #           uses: docker/login-action@v2
+# #           with:
+# #             username: ${{ vars.DOCKERHUB_USERNAME }}
+# #             password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-#   docker:
-#     name: Containerization
-#     needs: [unit-testing, code-coverage]
-#     runs-on: ubuntu-latest
-#     steps:
-#       - name: Checkout Repo
-#         uses: actions/checkout@v4
+# #         - name: GHCR Login
+# #           uses: docker/login-action@v2.2.0
+# #           with:
+# #             registry: ghcr.io
+# #             #username: ${{ github.repository_owner }}
+# #             username: haythammohamed
+# #             password: ${{ secrets.GITHUB_TOKEN }}
 
-#       - name: DockerHub Login
-#         uses: docker/login-action@v2
-#         with:
-#           username: ${{ vars.DOCKERHUB_USERNAME }}
-#           password: ${{ secrets.DOCKERHUB_PASSWORD }}
+# #         - name: Docker build for testing
+# #           uses: docker/build-push-action@v4
+# #           with:
+# #             context: .
+# #             push: false
+# #             tags: ${{vars.DOCKERHUB_ACCOUNT}}/solar-system:${{ github.sha }}
 
-#       - name: Docker build for testing
-#         uses: docker/build-push-action@v4
-#         with:
-#           context: .
-#           push: false
-#           tags: ${{vars.DOCKERHUB_ACCOUNT}}/solar-system:${{ github.sha }}
+# #         - name: Docker image testing
+# #           run: |
+# #             # Check Docker images
+# #             docker images
 
-#       - name: Docker image testing
-#         run: |
-#           # Check Docker images
-#           docker images
+# #             # Run the Docker container with environment variables
+# #             docker run --name solar-system-app -d \
+# #               -p 3000:3000 \
+# #               -e MONGO_URI=$MONGO_URI \
+# #               -e MONGO_USERNAME=$MONGO_USERNAME \
+# #               -e MONGO_PASSWORD=$MONGO_PASSWORD \
+# #               ${{vars.DOCKERHUB_ACCOUNT}}/solar-system:${{ github.sha }}
 
-#           # Run the Docker container with environment variables
-#           docker run --name solar-system-app -d \
-#             -p 3000:3000 \
-#             -e MONGO_URI=$MONGO_URI \
-#             -e MONGO_USERNAME=$MONGO_USERNAME \
-#             -e MONGO_PASSWORD=$MONGO_PASSWORD \
-#             ${{vars.DOCKERHUB_ACCOUNT}}/solar-system:${{ github.sha }}
+# #             # Sleep to give the container time to start
+# #             sleep 5
 
-#           # Sleep to give the container time to start
-#           sleep 5
+# #             # Inspect IP and test connectivity
+# #             export IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' solar-system-app)
+# #             echo "Container IP: $IP"
+# #             echo "Testing Image URL using wget"
+# #             wget -q -O - http://127.0.0.1:3000/live | grep live
 
-#           # Inspect IP and test connectivity
-#           export IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' solar-system-app)
-#           echo "Container IP: $IP"
-#           echo "Testing Image URL using wget"
-#           wget -q -O - http://127.0.0.1:3000/live | grep live
+# #         - name: Docker build and push
+# #           uses: docker/build-push-action@v4
+# #           with:
+# #             context: .
+# #             push: true
+# #             tags: ${{vars.DOCKERHUB_ACCOUNT}}/solar-system:${{ github.sha }}
 
-#       - name: Docker build and push
-#         uses: docker/build-push-action@v3
-#         with:
-#           context: .
-#           push: true
-#           tags: ${{vars.DOCKERHUB_ACCOUNT}}/solar-system:${{ github.sha }}
+# #         - name: Container Registry Push
+# #           uses: docker/build-push-action@v4
+# #           with:
+# #             context: .
+# #             push: true
+# #             tags: |
+# #               ${{ vars.DOCKERHUB_ACCOUNT }}/solar-system:${{ github.sha }}
+# #               ghcr.io/haythammohamd/solar-system:${{ github.sha }}
 
-# # ================================================= 08- Login and Push to GHCR  ===================
-# ---
-#   name: 08-Login and Push to GHCR
-#   on:
-#     workflow_dispatch: null
-#     push:
-#       branches:
-#         - main
-#         - feature/*
-#   env:
-#     MONGO_URI: mongodb+srv://supercluster.d83jj.mongodb.net/superData
-#     MONGO_USERNAME: superuser
-#     MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
-#   jobs:
-#     unit-testing:
-#       name: Unit Testing
-#       runs-on: ubuntu-latest
-#       steps:
-#         - name: Checkout Repository
-#           uses: actions/checkout@v4
-#         - name: Setup NodeJS Version
-#           uses: actions/setup-node@v3
-#           with:
-#             node-version: 20
-#         - name: Install Dependencies
-#           run: npm install
-
-#         - name: Cache NPM Dependencies
-#           uses: actions/cache@v3
-#           with:
-#             path: node_modules
-#             key: ${{ runner.os }}-node_modules-${{ hashFiles('package.json') }}
-
-#         - name: Unit Testing
-#           run: npm test
-
-#         - name: Archive Test Result
-#           if: always() #added
-#           uses: actions/upload-artifact@v3
-#           with:
-#             name: Mocha-Test-Result
-#             path: test-results.xml
-
-#     code-coverage:
-#       runs-on: ubuntu-latest
-#       steps:
-#         - uses: actions/checkout@v4
-#         - uses: actions/setup-node@v3
-#           with:
-#             node-version: 18
-
-#         - name: Cache NPM Dependencies
-#           uses: actions/cache@v3
-#           with:
-#             path: node_modules
-#             key: ${{ runner.os }}-node_modules-${{ hashFiles('package.json') }}
-
-#         - run: npm install
-#         - continue-on-error: true
-#           run: npm run coverage
-#         - uses: actions/upload-artifact@v3
-#           with:
-#             name: Code-Coverage-Result
-#             path: coverage
-#             retention-days: 5
-
-#     docker:
-#       name: Containerization
-#       needs: [unit-testing, code-coverage]
-#       permissions:
-#         packages: write
-#       runs-on: ubuntu-latest
-#       steps:
-#         - name: Checkout Repo
-#           uses: actions/checkout@v4
-
-#         - name: DockerHub Login
-#           uses: docker/login-action@v2
-#           with:
-#             username: ${{ vars.DOCKERHUB_USERNAME }}
-#             password: ${{ secrets.DOCKERHUB_PASSWORD }}
-
-#         - name: GHCR Login
-#           uses: docker/login-action@v2.2.0
-#           with:
-#             registry: ghcr.io
-#             #username: ${{ github.repository_owner }}
-#             username: haythammohamed
-#             password: ${{ secrets.GITHUB_TOKEN }}
-
-#         - name: Docker build for testing
-#           uses: docker/build-push-action@v4
-#           with:
-#             context: .
-#             push: false
-#             tags: ${{vars.DOCKERHUB_ACCOUNT}}/solar-system:${{ github.sha }}
-
-#         - name: Docker image testing
-#           run: |
-#             # Check Docker images
-#             docker images
-
-#             # Run the Docker container with environment variables
-#             docker run --name solar-system-app -d \
-#               -p 3000:3000 \
-#               -e MONGO_URI=$MONGO_URI \
-#               -e MONGO_USERNAME=$MONGO_USERNAME \
-#               -e MONGO_PASSWORD=$MONGO_PASSWORD \
-#               ${{vars.DOCKERHUB_ACCOUNT}}/solar-system:${{ github.sha }}
-
-#             # Sleep to give the container time to start
-#             sleep 5
-
-#             # Inspect IP and test connectivity
-#             export IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' solar-system-app)
-#             echo "Container IP: $IP"
-#             echo "Testing Image URL using wget"
-#             wget -q -O - http://127.0.0.1:3000/live | grep live
-
-#         - name: Docker build and push
-#           uses: docker/build-push-action@v4
-#           with:
-#             context: .
-#             push: true
-#             tags: ${{vars.DOCKERHUB_ACCOUNT}}/solar-system:${{ github.sha }}
-
-#         - name: Container Registry Push
-#           uses: docker/build-push-action@v4
-#           with:
-#             context: .
-#             push: true
-#             tags: |
-#               ${{ vars.DOCKERHUB_ACCOUNT }}/solar-system:${{ github.sha }}
-#               ghcr.io/haythammohamd/solar-system:${{ github.sha }}
-
-# ================================================= 09- install kubectl and get nodes  ===================
+# # ================================================= 09- install kubectl and get nodes  ===================
 ---
 name: 09- install kubectl and get nodes
 on:
