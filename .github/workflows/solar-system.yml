@@ -788,61 +788,60 @@
       name: Unit Testing
       strategy:
         matrix:
-          nodejs_version: [18, 19, 20]
-          operating_system: [ubuntu-latest, macos-latest]
+          nodejs_version:
+            - 18
+            - 19
+            - 20
+          operating_system:
+            - ubuntu-latest
+            - macos-latest
           exclude:
             - nodejs_version: 18
-            - operating_system: macos-latest      
-
+            - operating_system: macos-latest
       runs-on: ${{matrix.operating_system}}
       steps:
         - name: Checkout Repository
           uses: actions/checkout@v4
-
         - name: Setup NodeJS Version - ${{matrix.nodejs_version}}
           uses: actions/setup-node@v3
           with:
             node-version: ${{matrix.nodejs_version}}
-
+        - name: Install Dependencies
+          run: npm install
         - name: Cache NPM dependencies
           uses: action/cache@v3
           with:
             path: node_modules
             key: ${{runner.os}}-node-modules-${{ hashFiles('package.json')}}
-
         - name: Unit Testing
           run: npm test
-
         - name: Archive Test Result
-          if: always() #added
           uses: actions/upload-artifact@v3
           with:
             name: Mocha-Test-Result
             path: test-results.xml
-
     code-coverage:
-      runs-on: ubuntu-latest
-      steps:
-        - uses: actions/checkout@v4
-        - uses: actions/setup-node@v3
-          with:
-            node-version: 18
-
-        - name: Cache NPM dependencies
-          uses: action/cache@v3
-          with:
-            path: node_modules
-            key: ${{runner.os}}-node-modules-${{ hashFiles('package.json')}}
-
-        - run: npm install
-        - continue-on-error: true
-          run: npm run coverage
-        - uses: actions/upload-artifact@v3
-          with:
-            name: Code-Coverage-Result
-            path: coverage
-            retention-days: 5
-
+              runs-on: ubuntu-latest
+              steps:
+                - uses: actions/checkout@v4
+                - uses: actions/setup-node@v3
+                  with:
+                    node-version: 18
+                - name: Cache NPM dependencies
+                  uses: action/cache@v3
+                  with:
+                    path: node_modules
+                    key: ${{runner.os}}-node-modules-${{ hashFiles('package.json')}}
+                - run: npm install
+                - continue-on-error: true
+                  run: npm run coverage
+                - uses: actions/upload-artifact@v3
+                  with:
+                    name: Code-Coverage-Result
+                    path: coverage
+                    retention-days: 5
+  
+        
 # # ================================================= 04-docker ===================
 # # ---
 # #   name: docker
