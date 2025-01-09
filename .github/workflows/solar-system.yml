@@ -642,9 +642,9 @@
 # #             name: Mocha-Test-Result
 # #             path: test-results.xml
 
-#================================================= 01 checkout setupnodejs_version Install_Dependencies ===================
+#================================================= 01 Run Unit Testing using Matrix Strategy ===================
 
-  name: Solar System Workflow
+  name: Solar System Workflow Run Unit Testing using Matrix Strategy
   on:
     workflow_dispatch: null
     push:
@@ -661,7 +661,7 @@
       strategy:
         matrix:
           nodejs_version: [18, 19, 20]
-          operating_system: [ubuntu-lates, macos-latest]
+          operating_system: [ubuntu-latest, macos-latest]
           exclude:
             - nodejs_version: 18
             - operating_system: macos-latest      
