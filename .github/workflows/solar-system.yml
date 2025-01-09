@@ -770,9 +770,81 @@
 # #             path: coverage
 # #             retention-days: 5
 
-# # ================================================= 03 Cache Node Dependencies ===================
+# # # ================================================= 03 Cache Node Dependencies ===================
+# ---
+#   name: Cache Node Dependencies
+#   on:
+#     workflow_dispatch: null
+#     push:
+#       branches:
+#         - main
+#         - feature/*
+#   env:
+#     MONGO_URI: mongodb+srv://supercluster.d83jj.mongodb.net/superData
+#     MONGO_USERNAME: superuser
+#     MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
+#   jobs:
+#     unit-testing:
+#       name: Unit Testing
+#       strategy:
+#         matrix:
+#           nodejs_version:
+#             - 18
+#             - 19
+#             - 20
+#           operating_system:
+#             - ubuntu-latest
+#             - macos-latest
+#           exclude:
+#             - nodejs_version: 18
+#             - operating_system: macos-latest
+#       runs-on: ${{matrix.operating_system}}
+#       steps:
+#         - name: Checkout Repository
+#           uses: actions/checkout@v4
+#         - name: Setup NodeJS Version - ${{matrix.nodejs_version}}
+#           uses: actions/setup-node@v3
+#           with:
+#             node-version: ${{matrix.nodejs_version}}
+#         - name: Install Dependencies
+#           run: npm install
+#         - name: Cache NPM dependencies
+#           uses: action/cache@v3
+#           with:
+#             path: node_modules
+#             key: ${{runner.os}}-node-modules-${{ hashFiles('package.json')}}
+#         - name: Unit Testing
+#           run: npm test
+#         - name: Archive Test Result
+#           uses: actions/upload-artifact@v3
+#           with:
+#             name: Mocha-Test-Result
+#             path: test-results.xml
+#     code-coverage:
+#               runs-on: ubuntu-latest
+#               steps:
+#                 - uses: actions/checkout@v4
+#                 - uses: actions/setup-node@v3
+#                   with:
+#                     node-version: 18
+#                 - name: Cache NPM dependencies
+#                   uses: action/cache@v3
+#                   with:
+#                     path: node_modules
+#                     key: ${{runner.os}}-node-modules-${{ hashFiles('package.json')}}
+#                 - run: npm install
+#                 - continue-on-error: true
+#                   run: npm run coverage
+#                 - uses: actions/upload-artifact@v3
+#                   with:
+#                     name: Code-Coverage-Result
+#                     path: coverage
+#                     retention-days: 5
+  
+        
+# # ================================================= 04-docker ===================
 ---
-  name: Cache Node Dependencies
+  name: docker
   on:
     workflow_dispatch: null
     push:
@@ -786,124 +858,52 @@
   jobs:
     unit-testing:
       name: Unit Testing
-      strategy:
-        matrix:
-          nodejs_version:
-            - 18
-            - 19
-            - 20
-          operating_system:
-            - ubuntu-latest
-            - macos-latest
-          exclude:
-            - nodejs_version: 18
-            - operating_system: macos-latest
-      runs-on: ${{matrix.operating_system}}
+      runs-on: ubuntu-latest
       steps:
         - name: Checkout Repository
           uses: actions/checkout@v4
-        - name: Setup NodeJS Version - ${{matrix.nodejs_version}}
+        - name: Setup NodeJS Version
           uses: actions/setup-node@v3
           with:
-            node-version: ${{matrix.nodejs_version}}
+            node-version: 20
         - name: Install Dependencies
           run: npm install
-        - name: Cache NPM dependencies
-          uses: action/cache@v3
-          with:
-            path: node_modules
-            key: ${{runner.os}}-node-modules-${{ hashFiles('package.json')}}
         - name: Unit Testing
           run: npm test
         - name: Archive Test Result
+          if: always() #added
           uses: actions/upload-artifact@v3
           with:
             name: Mocha-Test-Result
             path: test-results.xml
-    code-coverage:
-              runs-on: ubuntu-latest
-              steps:
-                - uses: actions/checkout@v4
-                - uses: actions/setup-node@v3
-                  with:
-                    node-version: 18
-                - name: Cache NPM dependencies
-                  uses: action/cache@v3
-                  with:
-                    path: node_modules
-                    key: ${{runner.os}}-node-modules-${{ hashFiles('package.json')}}
-                - run: npm install
-                - continue-on-error: true
-                  run: npm run coverage
-                - uses: actions/upload-artifact@v3
-                  with:
-                    name: Code-Coverage-Result
-                    path: coverage
-                    retention-days: 5
-  
-        
-# # ================================================= 04-docker ===================
-# # ---
-# #   name: docker
-# #   on:
-# #     workflow_dispatch: null
-# #     push:
-# #       branches:
-# #         - main
-# #         - feature/*
-# #   env:
-# #     MONGO_URI: mongodb+srv://supercluster.d83jj.mongodb.net/superData
-# #     MONGO_USERNAME: superuser
-# #     MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
-# #   jobs:
-# #     unit-testing:
-# #       name: Unit Testing
-# #       runs-on: ubuntu-latest
-# #       steps:
-# #         - name: Checkout Repository
-# #           uses: actions/checkout@v4
-# #         - name: Setup NodeJS Version
-# #           uses: actions/setup-node@v3
-# #           with:
-# #             node-version: 20
-# #         - name: Install Dependencies
-# #           run: npm install
-# #         - name: Unit Testing
-# #           run: npm test
-# #         - name: Archive Test Result
-# #           if: always() #added
-# #           uses: actions/upload-artifact@v3
-# #           with:
-# #             name: Mocha-Test-Result
-# #             path: test-results.xml
 
-# #     code-coverage:
-# #       runs-on: ubuntu-latest
-# #       steps:
-# #         - uses: actions/checkout@v4
-# #         - uses: actions/setup-node@v3
-# #           with:
-# #             node-version: 18
-# #         - run: npm install
-# #         - continue-on-error: true
-# #           run: npm run coverage
-# #         - uses: actions/upload-artifact@v3
-# #           with:
-# #             name: Code-Coverage-Result
-# #             path: coverage
-# #             retention-days: 5
-# #     docker:
-# #       name: Containerization
-# #       needs: [unit-testing,code-coverage]
-# #       runs-on: ubuntu-latest
-# #       steps:
-# #         - name: Checkout Repo
-# #           uses: actions/checkout@v4
-# #         - name: DockerHub Login
-# #           uses: docker/login-action@v2.2.0
-# #           with:
-# #             username: ${{ vars.DOCKERHUB_USERNAME }}
-# #             password: ${{ secrets.DOCKERHUB_PASSWORD }}
+    code-coverage:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v4
+        - uses: actions/setup-node@v3
+          with:
+            node-version: 18
+        - run: npm install
+        - continue-on-error: true
+          run: npm run coverage
+        - uses: actions/upload-artifact@v3
+          with:
+            name: Code-Coverage-Result
+            path: coverage
+            retention-days: 5
+    docker:
+      name: Containerization
+      needs: [unit-testing,code-coverage]
+      runs-on: ubuntu-latest
+      steps:
+        - name: Checkout Repo
+          uses: actions/checkout@v4
+        - name: DockerHub Login
+          uses: docker/login-action@v2.2.0
+          with:
+            username: ${{ vars.DOCKERHUB_USERNAME }}
+            password: ${{ secrets.DOCKERHUB_PASSWORD }}
 # # ================================================= 05-docker build for testing step ===================
 # # ---
 # #   name: 05-docker build for testing step
