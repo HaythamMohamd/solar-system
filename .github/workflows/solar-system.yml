@@ -842,178 +842,178 @@
 #                     retention-days: 5
   
         
-      # ================================================= 05-docker build for testing step ===================
----
-  name: 05-docker build for testing step
-  on:
-    workflow_dispatch: null
-    push:
-      branches:
-        - main
-        - feature/*
-  env:
-    MONGO_URI: mongodb+srv://supercluster.d83jj.mongodb.net/superData
-    MONGO_USERNAME: superuser
-    MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
-  jobs:
-    unit-testing:
-      name: Unit Testing
-      runs-on: ubuntu-latest
-      steps:
-        - name: Checkout Repository
-          uses: actions/checkout@v4
-        - name: Setup NodeJS Version
-          uses: actions/setup-node@v3
-          with:
-            node-version: 20
-        - name: Install Dependencies
-          run: npm install
-        - name: Unit Testing
-          run: npm test
-        - name: Archive Test Result
-          if: always() #added
-          uses: actions/upload-artifact@v3
-          with:
-            name: Mocha-Test-Result
-            path: test-results.xml
+#       # ================================================= 05-docker build for testing step ===================
+# ---
+#   name: 05-docker build for testing step
+#   on:
+#     workflow_dispatch: null
+#     push:
+#       branches:
+#         - main
+#         - feature/*
+#   env:
+#     MONGO_URI: mongodb+srv://supercluster.d83jj.mongodb.net/superData
+#     MONGO_USERNAME: superuser
+#     MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
+#   jobs:
+#     unit-testing:
+#       name: Unit Testing
+#       runs-on: ubuntu-latest
+#       steps:
+#         - name: Checkout Repository
+#           uses: actions/checkout@v4
+#         - name: Setup NodeJS Version
+#           uses: actions/setup-node@v3
+#           with:
+#             node-version: 20
+#         - name: Install Dependencies
+#           run: npm install
+#         - name: Unit Testing
+#           run: npm test
+#         - name: Archive Test Result
+#           if: always() #added
+#           uses: actions/upload-artifact@v3
+#           with:
+#             name: Mocha-Test-Result
+#             path: test-results.xml
 
-    code-coverage:
-      runs-on: ubuntu-latest
-      steps:
-        - uses: actions/checkout@v4
-        - uses: actions/setup-node@v3
-          with:
-            node-version: 18
-        - run: npm install
-        - continue-on-error: true
-          run: npm run coverage
-        - uses: actions/upload-artifact@v3
-          with:
-            name: Code-Coverage-Result
-            path: coverage
-            retention-days: 5
+#     code-coverage:
+#       runs-on: ubuntu-latest
+#       steps:
+#         - uses: actions/checkout@v4
+#         - uses: actions/setup-node@v3
+#           with:
+#             node-version: 18
+#         - run: npm install
+#         - continue-on-error: true
+#           run: npm run coverage
+#         - uses: actions/upload-artifact@v3
+#           with:
+#             name: Code-Coverage-Result
+#             path: coverage
+#             retention-days: 5
 
-    docker:
-      name: Containerization
-      needs: [unit-testing,code-coverage]
-      runs-on: ubuntu-latest
-      steps:
-        - name: Checkout Repo
-          uses: actions/checkout@v4
+#     docker:
+#       name: Containerization
+#       needs: [unit-testing,code-coverage]
+#       runs-on: ubuntu-latest
+#       steps:
+#         - name: Checkout Repo
+#           uses: actions/checkout@v4
 
-        - name: DockerHub Login
-          uses: docker/login-action@v2.2.0
-          with:
-            username: ${{ vars.DOCKERHUB_USERNAME }}
-            password: ${{ secrets.DOCKERHUB_PASSWORD }}
+#         - name: DockerHub Login
+#           uses: docker/login-action@v2.2.0
+#           with:
+#             username: ${{ vars.DOCKERHUB_USERNAME }}
+#             password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-        - name: Docker build for testing
-          uses: docker/build-push-action@v2.2.0
-          with:
-            context: .
-            push: false
-            tag: ${{ vars.DOCKERHUB_USERNAME }}/solar-system:${{ github.sha}}
+#         - name: Docker build for testing
+#           uses: docker/build-push-action@v2.2.0
+#           with:
+#             context: .
+#             push: false
+#             tag: ${{ vars.DOCKERHUB_USERNAME }}/solar-system:${{ github.sha}}
 
 # # # ================================================= 06-Docker image testing and push to dockerhub  ===================
-# # ---
-# # # name: 06-Docker image testing and push
-# # # on:
-# # #   workflow_dispatch: null
-# # #   push:
-# # #     branches:
-# # #       - main
-# # #       - feature/*
-# # # env:
-# # #   MONGO_URI: mongodb+srv://supercluster.d83jj.mongodb.net/superData
-# # #   MONGO_USERNAME: superuser
-# # #   MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
-# # # jobs:
-# # #   unit-testing:
-# # #     name: Unit Testing
-# # #     runs-on: ubuntu-latest
-# # #     steps:
-# #       - name: Checkout Repository
-# #         uses: actions/checkout@v4
-# #       - name: Setup NodeJS Version
-# #         uses: actions/setup-node@v3
-# #         with:
-# #           node-version: 20
-# #       - name: Install Dependencies
-# #         run: npm install
-# #       - name: Unit Testing
-# #         run: npm test
-# #       - name: Archive Test Result
-# #         if: always() #added
-# #         uses: actions/upload-artifact@v3
-# #         with:
-# #           name: Mocha-Test-Result
-# #           path: test-results.xml
+# ---
+name: 06-Docker image testing and push
+on:
+  workflow_dispatch: null
+  push:
+    branches:
+      - main
+      - feature/*
+env:
+  MONGO_URI: mongodb+srv://supercluster.d83jj.mongodb.net/superData
+  MONGO_USERNAME: superuser
+  MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
+jobs:
+  unit-testing:
+    name: Unit Testing
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: Setup NodeJS Version
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+      - name: Install Dependencies
+        run: npm install
+      - name: Unit Testing
+        run: npm test
+      - name: Archive Test Result
+        if: always() #added
+        uses: actions/upload-artifact@v3
+        with:
+          name: Mocha-Test-Result
+          path: test-results.xml
 
-# #   code-coverage:
-# #     runs-on: ubuntu-latest
-# #     steps:
-# #       - uses: actions/checkout@v4
-# #       - uses: actions/setup-node@v3
-# #         with:
-# #           node-version: 18
-# #       - run: npm install
-# #       - continue-on-error: true
-# #         run: npm run coverage
-# #       - uses: actions/upload-artifact@v3
-# #         with:
-# #           name: Code-Coverage-Result
-# #           path: coverage
-# #           retention-days: 5
+  code-coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - run: npm install
+      - continue-on-error: true
+        run: npm run coverage
+      - uses: actions/upload-artifact@v3
+        with:
+          name: Code-Coverage-Result
+          path: coverage
+          retention-days: 5
 
-# #   docker:
-# #     name: Containerization
-# #     needs: [unit-testing, code-coverage]
-# #     runs-on: ubuntu-latest
-# #     steps:
-# #       - name: Checkout Repo
-# #         uses: actions/checkout@v4
+  docker:
+    name: Containerization
+    needs: [unit-testing, code-coverage]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
 
-# #       - name: DockerHub Login
-# #         uses: docker/login-action@v2
-# #         with:
-# #           username: ${{ vars.DOCKERHUB_USERNAME }}
-# #           password: ${{ secrets.DOCKERHUB_PASSWORD }}
+      - name: DockerHub Login
+        uses: docker/login-action@v2
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
-# #       - name: Docker build for testing
-# #         uses: docker/build-push-action@v4
-# #         with:
-# #           context: .
-# #           push: false
-# #           tags: ${{vars.DOCKERHUB_ACCOUNT}}/solar-system:${{ github.sha }}
+      - name: Docker build for testing
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: false
+          tags: ${{vars.DOCKERHUB_ACCOUNT}}/solar-system:${{ github.sha }}
 
-# #       - name: Docker image testing
-# #         run: |
-# #           # Check Docker images
-# #           docker images
+      - name: Docker image testing
+        run: |
+          # Check Docker images
+          docker images
 
-# #           # Run the Docker container with environment variables
-# #           docker run --name solar-system-app -d \
-# #             -p 3000:3000 \
-# #             -e MONGO_URI=$MONGO_URI \
-# #             -e MONGO_USERNAME=$MONGO_USERNAME \
-# #             -e MONGO_PASSWORD=$MONGO_PASSWORD \
-# #             ${{vars.DOCKERHUB_ACCOUNT}}/solar-system:${{ github.sha }}
+          # Run the Docker container with environment variables
+          docker run --name solar-system-app -d \
+            -p 3000:3000 \
+            -e MONGO_URI=$MONGO_URI \
+            -e MONGO_USERNAME=$MONGO_USERNAME \
+            -e MONGO_PASSWORD=$MONGO_PASSWORD \
+            ${{vars.DOCKERHUB_ACCOUNT}}/solar-system:${{ github.sha }}
 
-# #           # Sleep to give the container time to start
-# #           sleep 5
+          # Sleep to give the container time to start
+          sleep 5
 
-# #           # Inspect IP and test connectivity
-# #           export IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' solar-system-app)
-# #           echo "Container IP: $IP"
-# #           echo "Testing Image URL using wget"
-# #           wget -q -O - http://127.0.0.1:3000/live | grep live
+          # Inspect IP and test connectivity
+          export IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' solar-system-app)
+          echo "Container IP: $IP"
+          echo "Testing Image URL using wget"
+          wget -q -O - http://127.0.0.1:3000/live | grep live
 
-# #       - name: Docker build and push
-# #         uses: docker/build-push-action@v3
-# #         with:
-# #           context: .
-# #           push: true
-# #           tags: ${{vars.DOCKERHUB_ACCOUNT}}/solar-system:${{ github.sha }}
+      - name: Docker build and push
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          push: true
+          tags: ${{vars.DOCKERHUB_ACCOUNT}}/solar-system:${{ github.sha }}
 # # ================================================= 07-using cache  ===================
 # ---
 # # name: 07-using cache
