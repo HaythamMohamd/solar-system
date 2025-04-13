@@ -39,7 +39,8 @@
           run: npm test
 
         - name: Archive Test Result
+          if: success()  # only upload if previous steps succeeded
           uses: actions/upload-artifact@v4
           with:
-            name: Mocha-Test-Result-${{ github.run_id }}-${{ github.run_attempt }}
+            name: Mocha-Test-Result
             path: test-results.xml
