@@ -91,7 +91,7 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          push: false  # ✅ Corrected comment syntax
+          push: false  # ✅ will not push the image
           tags: ${{ vars.DOCKERHUB_ACCOUNT }}/solar-system:${{ github.sha }}
 
       - name: Docker image testing
@@ -112,3 +112,10 @@ jobs:
 
           echo "Testing endpoint:"
           wget -q -O - http://localhost:3000/live | grep live
+
+      - name: Docker build for testing
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true  # ✅ will  push the image to docker hub
+          tags: ${{ vars.DOCKERHUB_ACCOUNT }}/solar-system:${{ github.sha }}
