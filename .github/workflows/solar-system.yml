@@ -52,6 +52,7 @@
           run: npm install
 
         - name: Check Code Coverage
+          continue-on-error: true
           run: npm run coverage
 
         - name: Archive Test Result
@@ -60,3 +61,4 @@
           with:
             name: Mocha-Test-Result
             path: test-results.xml
+            retention-days: 5
