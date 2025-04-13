@@ -1,17 +1,14 @@
-name: 10-Docker Build and Test
-
+name: 07-using cache
 on:
-  workflow_dispatch:
+  workflow_dispatch: null
   push:
     branches:
       - main
       - feature/*
-
 env:
   MONGO_URI: mongodb+srv://supercluster.d83jj.mongodb.net/superData
   MONGO_USERNAME: superuser
   MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
-
 jobs:
   unit-testing:
     name: Unit Testing
@@ -19,12 +16,10 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-
       - name: Setup NodeJS Version
         uses: actions/setup-node@v3
         with:
           node-version: 20
-
       - name: Install Dependencies
         run: npm install
 
@@ -32,24 +27,22 @@ jobs:
         uses: actions/cache@v3
         with:
           path: node_modules
-          key: node_modules-${{ hashFiles('package.json') }}
+          key: ${{ runner.os }}-node_modules-${{ hashFiles('package.json') }}
 
       - name: Unit Testing
         run: npm test
 
       - name: Archive Test Result
-        if: always()
+        if: always() #added
         uses: actions/upload-artifact@v4
         with:
-          name: Mocha-Test-Result-${{ github.run_id }}
+          name: Mocha-Test-Result
           path: test-results.xml
 
   code-coverage:
-    name: Code Coverage
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-node@v3
         with:
           node-version: 18
@@ -58,18 +51,14 @@ jobs:
         uses: actions/cache@v3
         with:
           path: node_modules
-          key: node_modules-${{ hashFiles('package.json') }}
+          key: ${{ runner.os }}-node_modules-${{ hashFiles('package.json') }}
 
       - run: npm install
-
-      - name: Run Coverage (continue even if fails)
+      - continue-on-error: true
         run: npm run coverage
-        continue-on-error: true
-
-      - name: Upload Coverage
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
-          name: Code-Coverage-Result-${{ github.run_id }}
+          name: Code-Coverage-Result
           path: coverage
           retention-days: 5
 
@@ -82,7 +71,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: DockerHub Login
-        uses: docker/login-action@v2.2.0
+        uses: docker/login-action@v2
         with:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
@@ -91,31 +80,34 @@ jobs:
         uses: docker/build-push-action@v4
         with:
           context: .
-          push: false  # ✅ will not push the image
-          tags: ${{ vars.DOCKERHUB_ACCOUNT }}/solar-system:${{ github.sha }}
+          push: false
+          tags: ${{vars.DOCKERHUB_ACCOUNT}}/solar-system:${{ github.sha }}
 
       - name: Docker image testing
         run: |
-          echo "Checking Docker images..."
+          # Check Docker images
           docker images
 
-          echo "Running container..."
+          # Run the Docker container with environment variables
           docker run --name solar-system-app -d \
             -p 3000:3000 \
-            -e MONGO_URI=${{ env.MONGO_URI }} \
-            -e MONGO_USERNAME=${{ env.MONGO_USERNAME }} \
-            -e MONGO_PASSWORD=${{ env.MONGO_PASSWORD }} \
-            ${{ vars.DOCKERHUB_ACCOUNT }}/solar-system:${{ github.sha }}
+            -e MONGO_URI=$MONGO_URI \
+            -e MONGO_USERNAME=$MONGO_USERNAME \
+            -e MONGO_PASSWORD=$MONGO_PASSWORD \
+            ${{vars.DOCKERHUB_ACCOUNT}}/solar-system:${{ github.sha }}
 
-          echo "Waiting for container to be ready..."
-          sleep 10
+          # Sleep to give the container time to start
+          sleep 5
 
-          echo "Testing endpoint:"
-          wget -q -O - http://localhost:3000/live | grep live
+          # Inspect IP and test connectivity
+          export IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' solar-system-app)
+          echo "Container IP: $IP"
+          echo "Testing Image URL using wget"
+          wget -q -O - http://127.0.0.1:3000/live | grep live
 
-      - name: Docker build for testing
-        uses: docker/build-push-action@v4
+      - name: Docker build and push
+        uses: docker/build-push-action@v3
         with:
           context: .
-          push: true  # ✅ will  push the image to docker hub
-          tags: ${{ vars.DOCKERHUB_ACCOUNT }}/solar-system:${{ github.sha }}
+          push: true
+          tags: ${{vars.DOCKERHUB_ACCOUNT}}/solar-system:${{ github.sha }}
