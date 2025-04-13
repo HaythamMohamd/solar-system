@@ -27,7 +27,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: node_modules
-          key: ${{ runner.os }}-node_modules-${{ hashFiles('package.json') }}
+          key: node_modules-${{ hashFiles('package.json') }}
 
       - name: Unit Testing
         run: npm test
@@ -51,7 +51,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: node_modules
-          key: ${{ runner.os }}-node_modules-${{ hashFiles('package.json') }}
+          key: node_modules-${{ hashFiles('package.json') }}
 
       - run: npm install
       - continue-on-error: true
