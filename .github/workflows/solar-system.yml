@@ -1,14 +1,17 @@
 name: 09-Docker Login
+
 on:
-  workflow_dispatch: null
+  workflow_dispatch:
   push:
     branches:
       - main
       - feature/*
+
 env:
   MONGO_URI: mongodb+srv://supercluster.d83jj.mongodb.net/superData
   MONGO_USERNAME: superuser
   MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
+
 jobs:
   unit-testing:
     name: Unit Testing
@@ -16,10 +19,12 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+
       - name: Setup NodeJS Version
         uses: actions/setup-node@v3
         with:
           node-version: 20
+
       - name: Install Dependencies
         run: npm install
 
@@ -33,16 +38,18 @@ jobs:
         run: npm test
 
       - name: Archive Test Result
-        if: always() #added
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: Mocha-Test-Result
+          name: Mocha-Test-Result-${{ github.run_id }}
           path: test-results.xml
 
   code-coverage:
+    name: Code Coverage
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v3
         with:
           node-version: 18
@@ -54,24 +61,28 @@ jobs:
           key: node_modules-${{ hashFiles('package.json') }}
 
       - run: npm install
-      - continue-on-error: true
+
+      - name: Run Coverage (continue even if fails)
         run: npm run coverage
-      - uses: actions/upload-artifact@v4
+        continue-on-error: true
+
+      - name: Upload Coverage
+        uses: actions/upload-artifact@v4
         with:
-          name: Code-Coverage-Result
+          name: Code-Coverage-Result-${{ github.run_id }}
           path: coverage
           retention-days: 5
-	
-	docker:
+
+  docker:
     name: Containerization
-    needs: [unit-testing,code-coverage]
+    needs: [unit-testing, code-coverage]
     runs-on: ubuntu-latest
     steps:
-        - name: Checkout Repo
-          uses: actions/checkout@v4
-          
-        - name: DockerHub Login
-          uses: docker/login-action@v2.2.0
-          with:
-            username: ${{ vars.DOCKERHUB_USERNAME }}
-            password: ${{ secrets.DOCKERHUB_PASSWORD }}
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: DockerHub Login
+        uses: docker/login-action@v2.2.0
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
