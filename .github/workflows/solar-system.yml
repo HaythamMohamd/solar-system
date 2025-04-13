@@ -76,6 +76,14 @@ jobs:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
 
+      - name: GHCR Login
+        uses: docker/login-action@v2.2.0
+        with:
+          registry: ghcr.io
+          #username: ${{ github.repository_owner }}
+          username: haythammohamed
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Docker build for testing
         uses: docker/build-push-action@v4
         with:
@@ -111,3 +119,12 @@ jobs:
           context: .
           push: true
           tags: ${{vars.DOCKERHUB_ACCOUNT}}/solar-system:${{ github.sha }}
+
+      - name: Container Registry Push
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true
+          tags: |
+             ${{ vars.DOCKERHUB_ACCOUNT }}/solar-system:${{ github.sha }}
+             ghcr.io/haythammohamd/solar-system:${{ github.sha }}
