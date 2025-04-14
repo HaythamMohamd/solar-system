@@ -1,5 +1,4 @@
-name: 16- Run Code Coverage Job using a Container and Service
-
+name: 17- Setup Kubectl get nodes details
 on:
   workflow_dispatch:
   push:
@@ -32,7 +31,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: node_modules
-          key: ${{ runner.os }}-node_modules-${{ hashFiles('package.json') }}
+          key: node_modules-${{ hashFiles('package.json') }}
 
       - name: Unit Testing
         run: npm test
@@ -41,28 +40,18 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: Mocha-Test-Result
+          name: Mocha-Test-Result-${{ github.run_id }}
           path: test-results.xml
 
   code-coverage:
     name: Code Coverage
     runs-on: ubuntu-latest
-    container:
-      image: node:18
-
-    services:
-      mongodb:
-        image: siddharth67/monogo-db:non-production
-        ports:
-          - 27017:27017
-        env:
-          MONGO_URI: mongodb://localhost:27017/superData
-          MONGO_USERNAME: non-prod-user
-          MONGO_PASSWORD: non-prod-password
-
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18
 
       - name: Cache NPM Dependencies
         uses: actions/cache@v3
@@ -70,16 +59,80 @@ jobs:
           path: node_modules
           key: node_modules-${{ hashFiles('package.json') }}
 
-      - name: Install Dependencies
-        run: npm install
+      - run: npm install
 
-      - name: Run Code Coverage
+      - name: Run Coverage (continue even if fails)
         run: npm run coverage
         continue-on-error: true
 
-      - name: Upload Code Coverage Result
+      - name: Upload Coverage
         uses: actions/upload-artifact@v4
         with:
-          name: Code-Coverage-Result
+          name: Code-Coverage-Result-${{ github.run_id }}
           path: coverage
           retention-days: 5
+
+  docker:
+    name: Containerization
+    needs: [unit-testing, code-coverage]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: DockerHub Login
+        uses: docker/login-action@v2.2.0
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Docker build for testing
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: false  # ✅ will not push the image
+          tags: ${{ vars.DOCKERHUB_ACCOUNT }}/solar-system:${{ github.sha }}
+
+      - name: Docker image testing
+        run: |
+          echo "Checking Docker images..."
+          docker images
+
+          echo "Running container..."
+          docker run --name solar-system-app -d \
+            -p 3000:3000 \
+            -e MONGO_URI=${{ env.MONGO_URI }} \
+            -e MONGO_USERNAME=${{ env.MONGO_USERNAME }} \
+            -e MONGO_PASSWORD=${{ env.MONGO_PASSWORD }} \
+            ${{ vars.DOCKERHUB_ACCOUNT }}/solar-system:${{ github.sha }}
+
+          echo "Waiting for container to be ready..."
+          sleep 10
+
+          echo "Testing endpoint:"
+          wget -q -O - http://localhost:3000/live | grep live
+
+      - name: Docker build for testing
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: true  # ✅ will  push the image to docker hub
+          tags: ${{ vars.DOCKERHUB_ACCOUNT }}/solar-system:${{ github.sha }}
+
+  dev-deploy:
+    needs: docker
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: install kubectl cli
+        uses: azure/setup-kubectl@v3
+        with:
+          version: "v1.26.0"
+
+      - name: Fetch k8s cluster details
+        run: |
+          kubectl version --short
+          echo -------------------------------
+          kubectl get nodes
